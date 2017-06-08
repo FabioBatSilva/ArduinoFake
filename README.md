@@ -34,6 +34,10 @@ void loop()
 
 It can be tested using `ArduinoFake`:
 ```c++
+#include <ArduinoFake.h>
+
+using namespace fakeit;
+
 // test/test_main.cpp
 void test_loop(void)
 {
