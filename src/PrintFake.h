@@ -1,5 +1,4 @@
-#ifndef PRINT_FAKE_H
-#define PRINT_FAKE_H
+#pragma once
 
 #include "ArduinoFake.h"
 #include <arduino/Print.h>
@@ -35,4 +34,24 @@ struct PrintFake
     virtual size_t println(void) = 0;
 };
 
-#endif // PRINT_FAKE_H
+class PrintFakeProxy : public Print
+{
+    public:
+        PrintFakeProxy(PrintFake* fake)
+        {
+            printFake = fake;
+        }
+
+        size_t write(const uint8_t *buffer, size_t size)
+        {
+            return this->write(buffer, size);
+        }
+
+        size_t write(uint8_t value)
+        {
+            return this->write(value);
+        }
+
+    public:
+        PrintFake* printFake;
+};

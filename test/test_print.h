@@ -24,15 +24,17 @@ namespace PrintTest
         When(OverloadedMethod(ArduinoFake(Print), print, size_t(unsigned int, int))).AlwaysReturn();
         When(OverloadedMethod(ArduinoFake(Print), print, size_t(unsigned long, int))).AlwaysReturn();
 
-        ArduinoFakeInstance(Print)->print(char_var);
-        ArduinoFakeInstance(Print)->print(char_array_var);
-        ArduinoFakeInstance(Print)->print(unsigned_char_var, DEC);
+        Print* print = ArduinoFakeMock(Print);
 
-        ArduinoFakeInstance(Print)->print(int_var, DEC);
-        ArduinoFakeInstance(Print)->print(long_var, DEC);
-        ArduinoFakeInstance(Print)->print(double_var, BIN);
-        ArduinoFakeInstance(Print)->print(unsigned_int_var, DEC);
-        ArduinoFakeInstance(Print)->print(unsigned_long_var, DEC);
+        print->print(char_var);
+        print->print(char_array_var);
+        print->print(unsigned_char_var, DEC);
+
+        print->print(int_var, DEC);
+        print->print(long_var, DEC);
+        print->print(double_var, BIN);
+        print->print(unsigned_int_var, DEC);
+        print->print(unsigned_long_var, DEC);
 
         Verify(OverloadedMethod(ArduinoFake(Print), print, size_t(char)).Using(char_var)).Once();
         Verify(OverloadedMethod(ArduinoFake(Print), print, size_t(const char[])).Using(char_array_var)).Once();
@@ -68,16 +70,18 @@ namespace PrintTest
         When(OverloadedMethod(ArduinoFake(Print), println, size_t(unsigned int, int))).AlwaysReturn();
         When(OverloadedMethod(ArduinoFake(Print), println, size_t(unsigned long, int))).AlwaysReturn();
 
-        ArduinoFakeInstance(Print)->println();
-        ArduinoFakeInstance(Print)->println(char_var);
-        ArduinoFakeInstance(Print)->println(char_array_var);
-        ArduinoFakeInstance(Print)->println(unsigned_char_var, DEC);
+        Print* print = ArduinoFakeMock(Print);
 
-        ArduinoFakeInstance(Print)->println(int_var, DEC);
-        ArduinoFakeInstance(Print)->println(long_var, DEC);
-        ArduinoFakeInstance(Print)->println(double_var, BIN);
-        ArduinoFakeInstance(Print)->println(unsigned_int_var, DEC);
-        ArduinoFakeInstance(Print)->println(unsigned_long_var, DEC);
+        print->println();
+        print->println(char_var);
+        print->println(char_array_var);
+        print->println(unsigned_char_var, DEC);
+
+        print->println(int_var, DEC);
+        print->println(long_var, DEC);
+        print->println(double_var, BIN);
+        print->println(unsigned_int_var, DEC);
+        print->println(unsigned_long_var, DEC);
 
         Verify(OverloadedMethod(ArduinoFake(Print), println, size_t())).Once();
         Verify(OverloadedMethod(ArduinoFake(Print), println, size_t(char)).Using(char_var)).Once();

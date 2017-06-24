@@ -1,5 +1,4 @@
-#ifndef STREAM_FAKE_H
-#define STREAM_FAKE_H
+#pragma once
 
 #include "ArduinoFake.h"
 #include "PrintFake.h"
@@ -39,4 +38,38 @@ struct StreamFake : public PrintFake
     virtual String readStringUntil(char terminator) = 0;
 };
 
-#endif // STREAM_FAKE_H
+class StreamFakeProxy : public Stream, public PrintFakeProxy
+{
+    public:
+        StreamFake* streamFake;
+
+        StreamFakeProxy(StreamFake* streamFake) : PrintFakeProxy(streamFake)
+        {
+            streamFake = streamFake;
+        }
+
+        size_t write(uint8_t value)
+        {
+            return this->write(value);
+        }
+
+        int available()
+        {
+            return this->available();
+        }
+
+        int read()
+        {
+            return this->read();
+        }
+
+        int peek()
+        {
+            return this->peek();
+        }
+
+        void flush()
+        {
+            this->flush();
+        }
+};

@@ -9,7 +9,7 @@ using namespace fakeit;
 #include "test_print.h"
 #include "test_stream.h"
 #include "test_serial.h"
-#include "test_hardware_serial.h"
+#include "test_client.h"
 
 #ifdef UNIT_TEST
 
@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     RUN_TEST_GROUP(PrintTest);
     RUN_TEST_GROUP(StreamTest);
     RUN_TEST_GROUP(SerialTest);
-    RUN_TEST_GROUP(HardwareSerialTest);
+    //RUN_TEST_GROUP(ClientTest);
 
     UNITY_END();
 

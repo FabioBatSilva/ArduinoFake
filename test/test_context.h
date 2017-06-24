@@ -95,37 +95,17 @@ namespace ArduinoContextTest
         TEST_ASSERT_EQUAL(i1, i2);
     }
 
-    void test_hardware_serial_mock(void)
-    {
-        Mock<HardwareSerialFake>* m1 = &ArduinoFake(HardwareSerial);
-        Mock<HardwareSerialFake>* m2 = &ArduinoFake(HardwareSerial);
-
-        TEST_ASSERT_NOT_NULL(m1);
-        TEST_ASSERT_NOT_NULL(m2);
-        TEST_ASSERT_EQUAL(m1, m2);
-
-        HardwareSerialFake* i1 = ArduinoFakeInstance(HardwareSerial);
-        HardwareSerialFake* i2 = ArduinoFakeInstance(HardwareSerial);
-
-        TEST_ASSERT_NOT_NULL(i1);
-        TEST_ASSERT_NOT_NULL(i2);
-        TEST_ASSERT_EQUAL(i1, i2);
-    }
-
     void test_print_getter_overload(void)
     {
-        fakeit::Mock<HardwareSerial> hardwareSerialFake;
         fakeit::Mock<Serial_> serialFake;
         fakeit::Mock<Stream> streamFake;
         fakeit::Mock<Print> printFake;
 
-        PrintFake* hardwareSerialPrintFake = ArduinoFakeInstance(Print, &hardwareSerialFake.get());
         PrintFake* serialPrintFake = ArduinoFakeInstance(Print, &serialFake.get());
         PrintFake* streamPrintFake = ArduinoFakeInstance(Print, &streamFake.get());
         PrintFake* printFake1 = ArduinoFakeInstance(Print, &printFake.get());
         PrintFake* printFake2 = ArduinoFakeInstance(Print);
 
-        TEST_ASSERT_EQUAL(getArduinoFakeContext()->HardwareSerial(), hardwareSerialPrintFake);
         TEST_ASSERT_EQUAL(getArduinoFakeContext()->Serial(), serialPrintFake);
         TEST_ASSERT_EQUAL(getArduinoFakeContext()->Stream(), streamPrintFake);
         TEST_ASSERT_EQUAL(getArduinoFakeContext()->Print(), printFake1);
@@ -134,17 +114,14 @@ namespace ArduinoContextTest
 
     void test_stream_getter_overload(void)
     {
-        fakeit::Mock<HardwareSerial> hardwareSerialFake;
         fakeit::Mock<Serial_> serialFake;
         fakeit::Mock<Stream> streamFake;
 
-        PrintFake* hardwareSerialStreamFake = ArduinoFakeInstance(Stream, &hardwareSerialFake.get());
         PrintFake* serialStreamFake = ArduinoFakeInstance(Stream, &serialFake.get());
         PrintFake* streamFake1 = ArduinoFakeInstance(Stream, &streamFake.get());
         PrintFake* streamFake2 = ArduinoFakeInstance(Stream, &streamFake.get());
 
-        TEST_ASSERT_EQUAL(getArduinoFakeContext()->HardwareSerial(), hardwareSerialStreamFake);
-        TEST_ASSERT_EQUAL(getArduinoFakeContext()->HardwareSerial(), serialStreamFake);
+        TEST_ASSERT_EQUAL(getArduinoFakeContext()->Stream(), serialStreamFake);
         TEST_ASSERT_EQUAL(getArduinoFakeContext()->Serial(), streamFake2);
         TEST_ASSERT_EQUAL(getArduinoFakeContext()->Stream(), streamFake1);
     }
@@ -157,7 +134,6 @@ namespace ArduinoContextTest
         RUN_TEST(ArduinoContextTest::test_print_mock);
         RUN_TEST(ArduinoContextTest::test_stream_mock);
         RUN_TEST(ArduinoContextTest::test_serial_mock);
-        RUN_TEST(ArduinoContextTest::test_hardware_serial_mock);
         RUN_TEST(ArduinoContextTest::test_print_getter_overload);
     }
 }

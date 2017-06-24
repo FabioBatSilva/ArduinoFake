@@ -1,5 +1,4 @@
-#ifndef SERIAL_FAKE_H
-#define SERIAL_FAKE_H
+#pragma once
 
 #include "ArduinoFake.h"
 #include "StreamFake.h"
@@ -31,4 +30,13 @@ struct SerialFake : public StreamFake
     virtual bool rts() = 0;
 };
 
-#endif // SERIAL_FAKE_H
+class SerialFakeProxy : public StreamFakeProxy, public Serial_
+{
+    public:
+        SerialFake* serialFake;
+
+        SerialFakeProxy(SerialFake* fake) : StreamFakeProxy(fake)
+        {
+            serialFake = fake;
+        }
+};

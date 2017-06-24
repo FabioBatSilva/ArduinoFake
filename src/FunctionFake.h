@@ -2,7 +2,6 @@
 #define FUNCTION_FAKE_H
 
 #include <fakeit/fakeit.hpp>
-#include <arduino/Arduino.h>
 
 struct FunctionFake
 {

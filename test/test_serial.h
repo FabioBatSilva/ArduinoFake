@@ -21,11 +21,14 @@ namespace SerialTest
         When(OverloadedMethod(ArduinoFake(Serial), print, size_t(char))).AlwaysReturn();
         When(OverloadedMethod(ArduinoFake(Serial), print, size_t(int, int))).AlwaysReturn();
 
-        ArduinoFakeInstance(Stream)->print(stream_char_var);
-        ArduinoFakeInstance(Stream)->print(stream_int_var, DEC);
+        Stream* stream = ArduinoFakeMock(Stream);
+        Serial_* serial = ArduinoFakeMock(Serial);
 
-        ArduinoFakeInstance(Serial)->print(print_char_var);
-        ArduinoFakeInstance(Serial)->print(print_int_var, DEC);
+        stream->print(stream_char_var);
+        stream->print(stream_int_var, DEC);
+
+        serial->print(print_char_var);
+        serial->print(print_int_var, DEC);
 
         Verify(OverloadedMethod(ArduinoFake(Stream), print, size_t(char)).Using(stream_char_var)).Once();
         Verify(OverloadedMethod(ArduinoFake(Stream), print, size_t(int, int)).Using(stream_int_var, DEC)).Once();
