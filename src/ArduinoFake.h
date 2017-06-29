@@ -5,6 +5,7 @@
 #endif
 
 #include <cstring>
+#include <stdint.h>
 #include "fakeit/fakeit.hpp"
 
 #include "FunctionFake.h"
