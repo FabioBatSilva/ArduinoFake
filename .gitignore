@@ -1,2 +1,4 @@
 .pioenvs
 .piolibdeps
+/external/unity/*-repo/
+/build/

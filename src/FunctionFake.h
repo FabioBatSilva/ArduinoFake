@@ -1,7 +1,7 @@
 #ifndef FUNCTION_FAKE_H
 #define FUNCTION_FAKE_H
 
-#include <fakeit/fakeit.hpp>
+#include "fakeit/fakeit.hpp"
 
 struct FunctionFake
 {

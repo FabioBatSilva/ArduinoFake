@@ -5,15 +5,15 @@
 #endif
 
 #include <cstring>
-#include <fakeit/fakeit.hpp>
+#include "fakeit/fakeit.hpp"
 
-#include <FunctionFake.h>
-#include <StreamFake.h>
-#include <SerialFake.h>
-#include <ClientFake.h>
-#include <PrintFake.h>
+#include "FunctionFake.h"
+#include "StreamFake.h"
+#include "SerialFake.h"
+#include "ClientFake.h"
+#include "PrintFake.h"
 
-#include <arduino/Arduino.h>
+#include "arduino/Arduino.h"
 
 #define ArduinoFakeGetFunction() ArduinoFakeGetter(Function)
 #define ArduinoFakeGetSerial() ArduinoFakeGetter(Serial)
