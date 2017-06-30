@@ -50,26 +50,26 @@ class StreamFakeProxy : public Stream, public PrintFakeProxy
 
         size_t write(uint8_t value)
         {
-            return this->write(value);
+            return streamFake->write(value);
         }
 
         int available()
         {
-            return this->available();
+            return streamFake->available();
         }
 
         int read()
         {
-            return this->read();
+            return streamFake->read();
         }
 
         int peek()
         {
-            return this->peek();
+            return streamFake->peek();
         }
 
         void flush()
         {
-            this->flush();
+            streamFake->flush();
         }
 };

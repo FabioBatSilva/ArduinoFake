@@ -44,12 +44,12 @@ class PrintFakeProxy : public Print
 
         size_t write(const uint8_t *buffer, size_t size)
         {
-            return this->write(buffer, size);
+            return printFake->write(buffer, size);
         }
 
         size_t write(uint8_t value)
         {
-            return this->write(value);
+            return printFake->write(value);
         }
 
     public:

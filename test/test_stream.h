@@ -44,6 +44,8 @@ namespace StreamTest
         When(Method(ArduinoFake(Stream), peek)).Return(21, 22, 23);
         When(Method(ArduinoFake(Stream), flush)).AlwaysReturn();
 
+        Stream* stream = ArduinoFakeMock(Stream);
+
         TEST_ASSERT_EQUAL(0, ArduinoFakeInstance(Stream)->available());
         TEST_ASSERT_EQUAL(1, ArduinoFakeInstance(Stream)->available());
         TEST_ASSERT_EQUAL(0, ArduinoFakeInstance(Stream)->available());
