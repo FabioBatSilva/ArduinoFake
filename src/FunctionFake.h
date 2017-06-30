@@ -1,5 +1,4 @@
-#ifndef FUNCTION_FAKE_H
-#define FUNCTION_FAKE_H
+#pragma once
 
 #include "fakeit/fakeit.hpp"
 
@@ -40,5 +39,3 @@ struct FunctionFake
 
     virtual long map(long, long, long, long, long) = 0;
 };
-
-#endif // FUNCTION_FAKE_H
