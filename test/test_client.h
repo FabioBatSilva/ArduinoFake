@@ -52,11 +52,13 @@ namespace ClientTest
         IPAddress ipAddress1(62, 145, 182, 225);
         IPAddress ipAddress2(221, 155, 131, 19);
 
-        TEST_ASSERT_EQUAL(1, ArduinoFakeInstance(Client)->connect("localhost", 8080));
-        TEST_ASSERT_EQUAL(0, ArduinoFakeInstance(Client)->connect("localhost", 80));
+        Client* client = ArduinoFakeMock(Client);
 
-        TEST_ASSERT_EQUAL(0, ArduinoFakeInstance(Client)->connect(ipAddress1, 8080));
-        TEST_ASSERT_EQUAL(1, ArduinoFakeInstance(Client)->connect(ipAddress2, 8080));
+        TEST_ASSERT_EQUAL(1, client->connect("localhost", 8080));
+        TEST_ASSERT_EQUAL(0, client->connect("localhost", 80));
+
+        TEST_ASSERT_EQUAL(0, client->connect(ipAddress1, 8080));
+        TEST_ASSERT_EQUAL(1, client->connect(ipAddress2, 8080));
 
         Verify(OverloadedMethod(ArduinoFake(Client), connect, int(const char*, uint16_t)).Using("localhost", 8080)).Once();
         Verify(OverloadedMethod(ArduinoFake(Client), connect, int(const char*, uint16_t)).Using("localhost", 80)).Once();
@@ -76,11 +78,13 @@ namespace ClientTest
         When(OverloadedMethod(ArduinoFake(Client), write, size_t(uint8_t))).Return(1, 0);
         When(OverloadedMethod(ArduinoFake(Client), write, size_t(const uint8_t*, size_t))).Return(0, 1);
 
-        TEST_ASSERT_EQUAL(1, ArduinoFakeInstance(Client)->write(val1));
-        TEST_ASSERT_EQUAL(0, ArduinoFakeInstance(Client)->write(val2));
+        Client* client = ArduinoFakeMock(Client);
 
-        TEST_ASSERT_EQUAL(0, ArduinoFakeInstance(Client)->write(ptr1, 2));
-        TEST_ASSERT_EQUAL(1, ArduinoFakeInstance(Client)->write(ptr2, 3));
+        TEST_ASSERT_EQUAL(1, client->write(val1));
+        TEST_ASSERT_EQUAL(0, client->write(val2));
+
+        TEST_ASSERT_EQUAL(0, client->write(ptr1, 2));
+        TEST_ASSERT_EQUAL(1, client->write(ptr2, 3));
 
         Verify(OverloadedMethod(ArduinoFake(Client), write, size_t(uint8_t)).Using(val1)).Once();
         Verify(OverloadedMethod(ArduinoFake(Client), write, size_t(uint8_t)).Using(val2)).Once();
@@ -100,11 +104,13 @@ namespace ClientTest
         When(OverloadedMethod(ArduinoFake(Client), read, int())).Return(10, 20);
         When(OverloadedMethod(ArduinoFake(Client), read, int(uint8_t*, size_t))).Return(30, 400);
 
-        TEST_ASSERT_EQUAL(10, ArduinoFakeInstance(Client)->read());
-        TEST_ASSERT_EQUAL(20, ArduinoFakeInstance(Client)->read());
+        Client* client = ArduinoFakeMock(Client);
 
-        TEST_ASSERT_EQUAL(30, ArduinoFakeInstance(Client)->read(ptr1, 2));
-        TEST_ASSERT_EQUAL(400, ArduinoFakeInstance(Client)->read(ptr2, 3));
+        TEST_ASSERT_EQUAL(10, client->read());
+        TEST_ASSERT_EQUAL(20, client->read());
+
+        TEST_ASSERT_EQUAL(30, client->read(ptr1, 2));
+        TEST_ASSERT_EQUAL(400, client->read(ptr2, 3));
 
         Verify(OverloadedMethod(ArduinoFake(Client), read, int())).Exactly(2_Times);
 

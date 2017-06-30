@@ -3,7 +3,7 @@ default_target: all
 all: clean build test clean
 
 cmake:
-	@cmake $(CURDIR) -B$(CURDIR)/build
+	@cmake -DCMAKE_BUILD_TYPE=Debug $(CURDIR) -B$(CURDIR)/build
 
 build: cmake
 	@cd $(CURDIR)/build && make all

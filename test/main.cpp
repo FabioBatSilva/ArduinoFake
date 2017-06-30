@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     RUN_TEST_GROUP(PrintTest);
     RUN_TEST_GROUP(StreamTest);
     RUN_TEST_GROUP(SerialTest);
-    //RUN_TEST_GROUP(ClientTest);
+    RUN_TEST_GROUP(ClientTest);
 
     UNITY_END();
 

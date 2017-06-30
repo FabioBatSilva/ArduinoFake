@@ -1,5 +1,6 @@
 #include "ArduinoFake.h"
 #include "ClientFake.h"
+#include <stdexcept>
 
 ClientFake* getClientFakeProxy(Client* client)
 {
@@ -7,7 +8,7 @@ ClientFake* getClientFakeProxy(Client* client)
         return p->clientFake;
     }
 
-    return ArduinoFakeInstance(Client, client);
+    throw std::runtime_error("Invalid fake instance");
 }
 
 int Client::connect(IPAddress ip, uint16_t port)

@@ -43,9 +43,9 @@ class StreamFakeProxy : public Stream, public PrintFakeProxy
     public:
         StreamFake* streamFake;
 
-        StreamFakeProxy(StreamFake* streamFake) : PrintFakeProxy(streamFake)
+        StreamFakeProxy(StreamFake* fake) : PrintFakeProxy(fake)
         {
-            streamFake = streamFake;
+            streamFake = fake;
         }
 
         size_t write(uint8_t value)

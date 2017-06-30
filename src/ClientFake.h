@@ -29,14 +29,14 @@ struct ClientFake : public StreamFake
     virtual uint8_t connected() = 0;
 };
 
-class ClientFakeProxy : public Client
+class ClientFakeProxy : public StreamFakeProxy, public Client
 {
     public:
         ClientFake* clientFake;
 
-        ClientFakeProxy(ClientFake* clientFake)
+        ClientFakeProxy(ClientFake* fake) : StreamFakeProxy(fake)
         {
-            clientFake = clientFake;
+            clientFake = fake;
         }
 
         int connect(IPAddress ip, uint16_t port)

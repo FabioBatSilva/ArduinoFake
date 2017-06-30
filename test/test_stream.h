@@ -46,19 +46,19 @@ namespace StreamTest
 
         Stream* stream = ArduinoFakeMock(Stream);
 
-        TEST_ASSERT_EQUAL(0, ArduinoFakeInstance(Stream)->available());
-        TEST_ASSERT_EQUAL(1, ArduinoFakeInstance(Stream)->available());
-        TEST_ASSERT_EQUAL(0, ArduinoFakeInstance(Stream)->available());
+        TEST_ASSERT_EQUAL(0, stream->available());
+        TEST_ASSERT_EQUAL(1, stream->available());
+        TEST_ASSERT_EQUAL(0, stream->available());
 
-        TEST_ASSERT_EQUAL(11, ArduinoFakeInstance(Stream)->read());
-        TEST_ASSERT_EQUAL(12, ArduinoFakeInstance(Stream)->read());
-        TEST_ASSERT_EQUAL(13, ArduinoFakeInstance(Stream)->read());
+        TEST_ASSERT_EQUAL(11, stream->read());
+        TEST_ASSERT_EQUAL(12, stream->read());
+        TEST_ASSERT_EQUAL(13, stream->read());
 
-        TEST_ASSERT_EQUAL(21, ArduinoFakeInstance(Stream)->peek());
-        TEST_ASSERT_EQUAL(22, ArduinoFakeInstance(Stream)->peek());
-        TEST_ASSERT_EQUAL(23, ArduinoFakeInstance(Stream)->peek());
+        TEST_ASSERT_EQUAL(21, stream->peek());
+        TEST_ASSERT_EQUAL(22, stream->peek());
+        TEST_ASSERT_EQUAL(23, stream->peek());
 
-        ArduinoFakeInstance(Stream)->flush();
+        stream->flush();
 
         Verify(Method(ArduinoFake(Stream), available)).Exactly(3_Times);
         Verify(Method(ArduinoFake(Stream), read)).Exactly(3_Times);
@@ -82,17 +82,19 @@ namespace StreamTest
         When(OverloadedMethod(ArduinoFake(Stream), findUntil, bool(char*, char*))).Return(true, false);
         When(OverloadedMethod(ArduinoFake(Stream), findUntil, bool(char*, size_t, char*, size_t))).Return(true, false);
 
-        TEST_ASSERT_EQUAL(true, ArduinoFakeInstance(Stream)->find(char_ptr1));
-        TEST_ASSERT_EQUAL(false, ArduinoFakeInstance(Stream)->find(char_ptr2));
+        Stream* stream = ArduinoFakeMock(Stream);
 
-        TEST_ASSERT_EQUAL(true, ArduinoFakeInstance(Stream)->find(char_ptr1, 10));
-        TEST_ASSERT_EQUAL(false, ArduinoFakeInstance(Stream)->find(char_ptr2, 20));
+        TEST_ASSERT_EQUAL(true, stream->find(char_ptr1));
+        TEST_ASSERT_EQUAL(false, stream->find(char_ptr2));
 
-        TEST_ASSERT_EQUAL(true, ArduinoFakeInstance(Stream)->findUntil(char_ptr1, terminator_ptr));
-        TEST_ASSERT_EQUAL(false, ArduinoFakeInstance(Stream)->findUntil(char_ptr2, terminator_ptr));
+        TEST_ASSERT_EQUAL(true, stream->find(char_ptr1, 10));
+        TEST_ASSERT_EQUAL(false, stream->find(char_ptr2, 20));
 
-        TEST_ASSERT_EQUAL(true, ArduinoFakeInstance(Stream)->findUntil(char_ptr1, 10, terminator_ptr, 11));
-        TEST_ASSERT_EQUAL(false, ArduinoFakeInstance(Stream)->findUntil(char_ptr2, 20, terminator_ptr, 21));
+        TEST_ASSERT_EQUAL(true, stream->findUntil(char_ptr1, terminator_ptr));
+        TEST_ASSERT_EQUAL(false, stream->findUntil(char_ptr2, terminator_ptr));
+
+        TEST_ASSERT_EQUAL(true, stream->findUntil(char_ptr1, 10, terminator_ptr, 11));
+        TEST_ASSERT_EQUAL(false, stream->findUntil(char_ptr2, 20, terminator_ptr, 21));
 
         Verify(OverloadedMethod(ArduinoFake(Stream), find, bool(char*)).Using(char_ptr1)).Once();
         Verify(OverloadedMethod(ArduinoFake(Stream), find, bool(char*)).Using(char_ptr2)).Once();
@@ -109,11 +111,13 @@ namespace StreamTest
         When(Method(ArduinoFake(Stream), parseInt)).Return(10, 11);
         When(Method(ArduinoFake(Stream), parseFloat)).Return(2.0, 2.1);
 
-        TEST_ASSERT_INT_WITHIN(0, 10, ArduinoFakeInstance(Stream)->parseInt());
-        TEST_ASSERT_INT_WITHIN(0, 11, ArduinoFakeInstance(Stream)->parseInt());
+        Stream* stream = ArduinoFakeMock(Stream);
 
-        TEST_ASSERT_FLOAT_WITHIN(0, 2.0, ArduinoFakeInstance(Stream)->parseFloat());
-        TEST_ASSERT_FLOAT_WITHIN(0, 2.1, ArduinoFakeInstance(Stream)->parseFloat());
+        TEST_ASSERT_INT_WITHIN(0, 10, stream->parseInt());
+        TEST_ASSERT_INT_WITHIN(0, 11, stream->parseInt());
+
+        TEST_ASSERT_FLOAT_WITHIN(0, 2.0, stream->parseFloat());
+        TEST_ASSERT_FLOAT_WITHIN(0, 2.1, stream->parseFloat());
 
         Verify(Method(ArduinoFake(Stream), parseInt)).Exactly(2_Times);
         Verify(Method(ArduinoFake(Stream), parseFloat)).Exactly(2_Times);
@@ -135,17 +139,19 @@ namespace StreamTest
         When(Method(ArduinoFake(Stream), readString)).Return(str1, str2);
         When(Method(ArduinoFake(Stream), readStringUntil)).Return(str1, str2);
 
-        TEST_ASSERT_EQUAL_INT(1, ArduinoFakeInstance(Stream)->readBytes(char_ptr1, 10));
-        TEST_ASSERT_EQUAL_INT(2, ArduinoFakeInstance(Stream)->readBytes(char_ptr2, 20));
+        Stream* stream = ArduinoFakeMock(Stream);
 
-        TEST_ASSERT_EQUAL_INT(3, ArduinoFakeInstance(Stream)->readBytesUntil(terminator, char_ptr1, 10));
-        TEST_ASSERT_EQUAL_INT(4, ArduinoFakeInstance(Stream)->readBytesUntil(terminator, char_ptr2, 20));
+        TEST_ASSERT_EQUAL_INT(1, stream->readBytes(char_ptr1, 10));
+        TEST_ASSERT_EQUAL_INT(2, stream->readBytes(char_ptr2, 20));
 
-        TEST_ASSERT_TRUE(str1.equals(ArduinoFakeInstance(Stream)->readString()));
-        TEST_ASSERT_TRUE(str2.equals(ArduinoFakeInstance(Stream)->readString()));
+        TEST_ASSERT_EQUAL_INT(3, stream->readBytesUntil(terminator, char_ptr1, 10));
+        TEST_ASSERT_EQUAL_INT(4, stream->readBytesUntil(terminator, char_ptr2, 20));
 
-        TEST_ASSERT_TRUE(str1.equals(ArduinoFakeInstance(Stream)->readStringUntil(terminator)));
-        TEST_ASSERT_TRUE(str2.equals(ArduinoFakeInstance(Stream)->readStringUntil(terminator)));
+        TEST_ASSERT_TRUE(str1.equals(stream->readString()));
+        TEST_ASSERT_TRUE(str2.equals(stream->readString()));
+
+        TEST_ASSERT_TRUE(str1.equals(stream->readStringUntil(terminator)));
+        TEST_ASSERT_TRUE(str2.equals(stream->readStringUntil(terminator)));
 
         Verify(Method(ArduinoFake(Stream), readBytes).Using(char_ptr1, 10)).Once();
         Verify(Method(ArduinoFake(Stream), readBytes).Using(char_ptr2, 20)).Once();
