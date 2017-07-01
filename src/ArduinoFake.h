@@ -4,8 +4,10 @@
     #define USBCON
 #endif
 
+#include <map>
 #include <cstring>
 #include <cstdint>
+#include <stdexcept>
 #include "fakeit/fakeit.hpp"
 
 #include "FunctionFake.h"
@@ -75,8 +77,9 @@ struct ArduinoFakeInstances
 class ArduinoFakeContext
 {
     public:
-        ArduinoFakeMocks* Mocks = new ArduinoFakeMocks();
         ArduinoFakeInstances* Instances = new ArduinoFakeInstances();
+        ArduinoFakeMocks* Mocks = new ArduinoFakeMocks();
+        std::map<void*, void*> Mapping;
 
         ArduinoFakeSingleInstanceGetter(Print)
         ArduinoFakeSingleInstanceGetter(Stream)
@@ -84,24 +87,36 @@ class ArduinoFakeContext
         ArduinoFakeSingleInstanceGetter(Client)
         ArduinoFakeSingleInstanceGetter(Function)
 
+        ArduinoFakeContext()
+        {
+            Mapping[&::Serial] = this->Serial();
+        }
+
         PrintFake* Print(class Print* p)
         {
-            ArduinoFakeReturnInstaceOf(p, Serial)
-            ArduinoFakeReturnInstaceOf(p, Stream)
+            if (!Mapping[p]) {
+                throw std::runtime_error("Unknown Print instance");
+            }
 
-            return this->Print();
+            return (PrintFake*) Mapping[p];
         }
 
         StreamFake* Stream(class Stream* s)
         {
-            ArduinoFakeReturnInstaceOf(s, Serial)
+            if (!Mapping[s]) {
+                throw std::runtime_error("Unknown Stream instance");
+            }
 
-            return this->Stream();
+            return (StreamFake*) Mapping[s];
         }
 
-        ClientFake* Client(class Client* c)
+        SerialFake* Serial(class Serial_* s)
         {
-            return this->Client();
+            if (!Mapping[s]) {
+                throw std::runtime_error("Unknown Serial instance");
+            }
+
+            return (SerialFake*) Mapping[s];
         }
 
         void reset(void)

@@ -9,7 +9,7 @@ SerialFake* getSerialFake(Serial_* serial)
         return p->serialFake;
     }
 
-    return ArduinoFakeInstance(Serial);
+    return ArduinoFakeInstance(Serial, serial);
 }
 
 void Serial_::begin(unsigned long baud_count)
