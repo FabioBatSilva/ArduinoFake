@@ -42,11 +42,6 @@
 #define ArduinoFakeMock(mock, ...) \
     new mock##FakeProxy(ArduinoFakeInstance(mock, __VA_ARGS__))
 
-#define ArduinoFakeReturnInstaceOf(var, mock) \
-    if (std::strstr(typeid(*var).name(), #mock)) { \
-        return this->mock(); \
-    }
-
 #define ArduinoFakeSingleInstanceGetter(mock) \
     mock##Fake* mock() \
     { \
