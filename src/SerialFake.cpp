@@ -3,98 +3,89 @@
 
 #if defined(USBCON)
 
-SerialFake* getSerialFake(Serial_* serial)
-{
-    if (SerialFakeProxy* p = dynamic_cast<SerialFakeProxy*>(serial)) {
-        return p->serialFake;
-    }
-
-    return ArduinoFakeInstance(Serial, serial);
-}
-
 void Serial_::begin(unsigned long baud_count)
 {
-    getSerialFake(this)->begin(baud_count);
+    ArduinoFakeInstance(Serial, this)->begin(baud_count);
 }
 
 void Serial_::begin(unsigned long baud_count, byte config)
 {
-    getSerialFake(this)->begin(baud_count, config);
+    ArduinoFakeInstance(Serial, this)->begin(baud_count, config);
 }
 
 void Serial_::end(void)
 {
-    getSerialFake(this)->end();
+    ArduinoFakeInstance(Serial, this)->end();
 }
 
 int Serial_::available(void)
 {
-    return getSerialFake(this)->available();
+    return ArduinoFakeInstance(Serial, this)->available();
 }
 
 int Serial_::peek(void)
 {
-    return getSerialFake(this)->peek();
+    return ArduinoFakeInstance(Serial, this)->peek();
 }
 
 int Serial_::read(void)
 {
-    return getSerialFake(this)->read();
+    return ArduinoFakeInstance(Serial, this)->read();
 }
 
 int Serial_::availableForWrite(void)
 {
-    return getSerialFake(this)->availableForWrite();
+    return ArduinoFakeInstance(Serial, this)->availableForWrite();
 }
 
 void Serial_::flush(void)
 {
-    getSerialFake(this)->flush();
+    ArduinoFakeInstance(Serial, this)->flush();
 }
 
 size_t Serial_::write(uint8_t c)
 {
-    return getSerialFake(this)->write(c);
+    return ArduinoFakeInstance(Serial, this)->write(c);
 }
 
 size_t Serial_::write(const uint8_t *buffer, size_t size)
 {
-    return getSerialFake(this)->write(buffer, size);
+    return ArduinoFakeInstance(Serial, this)->write(buffer, size);
 }
 
 uint32_t Serial_::baud()
 {
-    return getSerialFake(this)->baud();
+    return ArduinoFakeInstance(Serial, this)->baud();
 }
 
 uint8_t Serial_::stopbits()
 {
-    return getSerialFake(this)->stopbits();
+    return ArduinoFakeInstance(Serial, this)->stopbits();
 }
 
 uint8_t Serial_::paritytype()
 {
-    return getSerialFake(this)->paritytype();
+    return ArduinoFakeInstance(Serial, this)->paritytype();
 }
 
 uint8_t Serial_::numbits()
 {
-    return getSerialFake(this)->numbits();
+    return ArduinoFakeInstance(Serial, this)->numbits();
 }
 
 bool Serial_::dtr()
 {
-    return getSerialFake(this)->dtr();
+    return ArduinoFakeInstance(Serial, this)->dtr();
 }
 
 bool Serial_::rts()
 {
-    return getSerialFake(this)->rts();
+    return ArduinoFakeInstance(Serial, this)->rts();
 }
 
 int32_t Serial_::readBreak()
 {
-    return getSerialFake(this)->readBreak();
+    return ArduinoFakeInstance(Serial, this)->readBreak();
 }
 
 Serial_ Serial = SerialFakeProxy(ArduinoFakeInstance(Serial));

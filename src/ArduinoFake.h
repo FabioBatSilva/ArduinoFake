@@ -18,17 +18,7 @@
 
 #include "arduino/Arduino.h"
 
-#define ArduinoFakeGetFunction() ArduinoFakeGetter(Function)
-#define ArduinoFakeGetSerial() ArduinoFakeGetter(Serial)
-#define ArduinoFakeGetStream() ArduinoFakeGetter(Stream)
-#define ArduinoFakeGetClient() ArduinoFakeGetter(Client)
-#define ArduinoFakeGetPrint() ArduinoFakeGetter(Print)
-#define ArduinoFakeGet() ArduinoFakeGetter(Function)
-
-#define ArduinoFake(mock) ArduinoFakeGet##mock()
-
-#define ArduinoFakeGetter(mock) \
-    getArduinoFakeContext()->Mocks->mock
+#define ArduinoFake(mock) _ArduinoFakeGet##mock()
 
 #define ArduinoFakeReset() \
     getArduinoFakeContext()->reset()
@@ -36,19 +26,38 @@
 #define ArduinoFakeInstance(mock, ...) \
     getArduinoFakeContext()->mock(__VA_ARGS__)
 
-#define ArduinoFakeInstanceFake(mock, ...) \
-    getArduinoFakeContext()->mock(__VA_ARGS__)
+#define ArduinoFakeMock(mock) \
+    new mock##FakeProxy(ArduinoFakeInstance(mock))
 
-#define ArduinoFakeMock(mock, ...) \
-    new mock##FakeProxy(ArduinoFakeInstance(mock, __VA_ARGS__))
+#define _ArduinoFakeGetMock(mock) \
+    getArduinoFakeContext()->Mocks->mock
 
-#define ArduinoFakeSingleInstanceGetter(mock) \
+#define _ArduinoFakeGetFunction() _ArduinoFakeGetMock(Function)
+#define _ArduinoFakeGetSerial() _ArduinoFakeGetMock(Serial)
+#define _ArduinoFakeGetStream() _ArduinoFakeGetMock(Stream)
+#define _ArduinoFakeGetClient() _ArduinoFakeGetMock(Client)
+#define _ArduinoFakeGetPrint() _ArduinoFakeGetMock(Print)
+#define _ArduinoFakeGet() _ArduinoFakeGetMock(Function)
+
+#define _ArduinoFakeInstanceGetter1(mock) \
     mock##Fake* mock() \
     { \
         if (!this->Instances->mock){ \
             this->Instances->mock = &this->Mocks->mock.get(); \
         } \
         return this->Instances->mock; \
+    }
+
+#define _ArduinoFakeInstanceGetter2(name, clazz) \
+    name##Fake* name(class clazz* instance) \
+    { \
+        if (Mapping[instance]) { \
+            return (name##Fake*) Mapping[instance]; \
+        } \
+        if (dynamic_cast<name##FakeProxy*>(instance)) { \
+            return dynamic_cast<name##FakeProxy*>(instance)->get##name##Fake(); \
+        } \
+        throw std::runtime_error("Unknown instance"); \
     }
 
 struct ArduinoFakeMocks
@@ -76,42 +85,20 @@ class ArduinoFakeContext
         ArduinoFakeMocks* Mocks = new ArduinoFakeMocks();
         std::map<void*, void*> Mapping;
 
-        ArduinoFakeSingleInstanceGetter(Print)
-        ArduinoFakeSingleInstanceGetter(Stream)
-        ArduinoFakeSingleInstanceGetter(Serial)
-        ArduinoFakeSingleInstanceGetter(Client)
-        ArduinoFakeSingleInstanceGetter(Function)
+        _ArduinoFakeInstanceGetter1(Print)
+        _ArduinoFakeInstanceGetter1(Stream)
+        _ArduinoFakeInstanceGetter1(Serial)
+        _ArduinoFakeInstanceGetter1(Client)
+        _ArduinoFakeInstanceGetter1(Function)
+
+        _ArduinoFakeInstanceGetter2(Print, Print)
+        _ArduinoFakeInstanceGetter2(Client, Client)
+        _ArduinoFakeInstanceGetter2(Stream, Stream)
+        _ArduinoFakeInstanceGetter2(Serial, Serial_)
 
         ArduinoFakeContext()
         {
-            Mapping[&::Serial] = this->Serial();
-        }
-
-        PrintFake* Print(class Print* p)
-        {
-            if (!Mapping[p]) {
-                throw std::runtime_error("Unknown Print instance");
-            }
-
-            return (PrintFake*) Mapping[p];
-        }
-
-        StreamFake* Stream(class Stream* s)
-        {
-            if (!Mapping[s]) {
-                throw std::runtime_error("Unknown Stream instance");
-            }
-
-            return (StreamFake*) Mapping[s];
-        }
-
-        SerialFake* Serial(class Serial_* s)
-        {
-            if (!Mapping[s]) {
-                throw std::runtime_error("Unknown Serial instance");
-            }
-
-            return (SerialFake*) Mapping[s];
+            this->reset();
         }
 
         void reset(void)
@@ -123,6 +110,8 @@ class ArduinoFakeContext
             this->Mocks->Serial.Reset();
             this->Mocks->Client.Reset();
             this->Mocks->Print.Reset();
+
+            Mapping[&::Serial] = this->Serial();
         }
 };
 

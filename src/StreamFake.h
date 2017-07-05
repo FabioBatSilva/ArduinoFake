@@ -40,9 +40,10 @@ struct StreamFake : public PrintFake
 
 class StreamFakeProxy : public Stream, public PrintFakeProxy
 {
-    public:
+    private:
         StreamFake* streamFake;
 
+    public:
         StreamFakeProxy(StreamFake* fake) : PrintFakeProxy(fake)
         {
             streamFake = fake;
@@ -71,5 +72,10 @@ class StreamFakeProxy : public Stream, public PrintFakeProxy
         void flush()
         {
             streamFake->flush();
+        }
+
+        StreamFake* getStreamFake()
+        {
+            return streamFake;
         }
 };

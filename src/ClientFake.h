@@ -31,9 +31,10 @@ struct ClientFake : public StreamFake
 
 class ClientFakeProxy : public StreamFakeProxy, public Client
 {
-    public:
+    private:
         ClientFake* clientFake;
 
+    public:
         ClientFakeProxy(ClientFake* fake) : StreamFakeProxy(fake)
         {
             clientFake = fake;
@@ -95,4 +96,9 @@ class ClientFakeProxy : public StreamFakeProxy, public Client
         }
 
         virtual operator bool();
+
+        ClientFake* getClientFake()
+        {
+            return clientFake;
+        }
 };

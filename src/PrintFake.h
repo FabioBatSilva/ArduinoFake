@@ -36,6 +36,9 @@ struct PrintFake
 
 class PrintFakeProxy : public Print
 {
+    private:
+        PrintFake* printFake;
+
     public:
         PrintFakeProxy(PrintFake* fake)
         {
@@ -52,6 +55,8 @@ class PrintFakeProxy : public Print
             return printFake->write(value);
         }
 
-    public:
-        PrintFake* printFake;
+        PrintFake* getPrintFake()
+        {
+            return printFake;
+        }
 };

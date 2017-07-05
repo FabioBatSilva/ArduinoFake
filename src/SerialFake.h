@@ -32,11 +32,17 @@ struct SerialFake : public StreamFake
 
 class SerialFakeProxy : public StreamFakeProxy, public Serial_
 {
-    public:
+    private:
         SerialFake* serialFake;
 
+    public:
         SerialFakeProxy(SerialFake* fake) : StreamFakeProxy(fake)
         {
             serialFake = fake;
+        }
+
+        SerialFake* getSerialFake()
+        {
+            return serialFake;
         }
 };
