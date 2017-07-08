@@ -1,34 +1,36 @@
-dist: trusty
+---
 sudo: false
+dist: trusty
 group: beta
-
 language: cpp
 
-matrix:
-  include:
-    - compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - git
-            - g++-5
-      env: COMPILER=g++-5
+install:
+    - curl -fsSL https://bootstrap.pypa.io/get-pip.py | python
+    - python -m pip install platformio
 
-    - compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
-          packages:
-            - git
-            - clang-3.6
-      env: COMPILER=clang++-3.6
+matrix:
+    include:
+        -
+            compiler: gcc
+            env: COMPILER=g++-5
+            addons:
+                apt:
+                    packages:
+                        - git
+                        - g++-5
+                    sources:
+                        - ubuntu-toolchain-r-test
+        -
+            compiler: clang
+            env: COMPILER=clang++-3.6
+            addons:
+                apt:
+                    packages:
+                        - git
+                        - clang-3.6
+                    sources:
+                        - ubuntu-toolchain-r-test
+                        - llvm-toolchain-precise-3.6
 
 script:
-  - git --version
-  - cmake --version
-  - make --version
-  - make build test 
+    - "make pio-test"
