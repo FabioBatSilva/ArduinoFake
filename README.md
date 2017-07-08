@@ -1,5 +1,7 @@
 # ArduinoFake
 
+[![Build Status](https://travis-ci.org/FabioBatSilva/ArduinoFake.svg?branch=master)](https://travis-ci.org/FabioBatSilva/ArduinoFake)
+
 `ArduinoFake` is a simple mocking framework for Arduino.
 `ArduinoFake` is based on [FakeIt](https://github.com/eranpeer/FakeIt) and can be used for testing your arduino project natively. No arduino required !
 
