@@ -10,13 +10,13 @@
 #include <stdexcept>
 #include "fakeit/fakeit.hpp"
 
+#include "arduino/Arduino.h"
+
 #include "FunctionFake.h"
 #include "StreamFake.h"
 #include "SerialFake.h"
 #include "ClientFake.h"
 #include "PrintFake.h"
-
-#include "arduino/Arduino.h"
 
 #define ArduinoFake(mock) _ArduinoFakeGet##mock()
 
