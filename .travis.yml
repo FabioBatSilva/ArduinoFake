@@ -12,7 +12,10 @@ matrix:
     include:
         -
             compiler: gcc
-            env: COMPILER=g++-5
+            env:
+                - COMPILER=g++-5
+                - MAKE_TASK=cmake-test
+                - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
             addons:
                 apt:
                     packages:
@@ -21,8 +24,39 @@ matrix:
                     sources:
                         - ubuntu-toolchain-r-test
         -
+            compiler: gcc
+            env:
+                - COMPILER=g++-5
+                - MAKE_TASK=cmake-test
+                - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+            addons:
+                apt:
+                    packages:
+                        - git
+                        - g++-5
+                    sources:
+                        - ubuntu-toolchain-r-test
+
+        -
             compiler: clang
-            env: COMPILER=clang++-3.6
+            env:
+                - MAKE_TASK=pio-test
+                - COMPILER=clang++-3.6
+                - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+            addons:
+                apt:
+                    packages:
+                        - git
+                        - clang-3.6
+                    sources:
+                        - ubuntu-toolchain-r-test
+                        - llvm-toolchain-precise-3.6
+        -
+            compiler: clang
+            env:
+                - MAKE_TASK=cmake-test
+                - COMPILER=clang++-3.6
+                - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
             addons:
                 apt:
                     packages:
@@ -33,4 +67,4 @@ matrix:
                         - llvm-toolchain-precise-3.6
 
 script:
-    - "make pio-test"
+    - "make $MAKE_TASKS"

@@ -19,6 +19,9 @@ test:
 pio-test:
 	@pio test
 
+.PHONY: cmake-test
+cmake-test: build test
+
 .PHONY: clean
 clean:
 	@rm -rf $(CURDIR)/build/*
