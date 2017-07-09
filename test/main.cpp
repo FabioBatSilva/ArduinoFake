@@ -10,6 +10,7 @@ using namespace fakeit;
 #include "test_stream.h"
 #include "test_serial.h"
 #include "test_client.h"
+#include "test_arduino_string.h"
 
 #ifdef UNIT_TEST
 
@@ -26,6 +27,8 @@ void setUp(void)
 int main(int argc, char **argv)
 {
     UNITY_BEGIN();
+
+    RUN_TEST_GROUP(ArduinoStringTest);
 
     RUN_TEST_GROUP(ArduinoContextTest);
     RUN_TEST_GROUP(FunctionTest);

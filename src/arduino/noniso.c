@@ -166,7 +166,7 @@ extern char* ultoa( unsigned long value, char *string, int radix )
 }
 
 char *dtostrf (double val, signed char width, unsigned char prec, char *sout) {
-  asm(".global _printf_float");
+  //asm(".global _printf_float");
 
   char fmt[20];
   sprintf(fmt, "%%%d.%df", width, prec);
