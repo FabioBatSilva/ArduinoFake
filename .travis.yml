@@ -13,8 +13,8 @@ matrix:
         -
             compiler: gcc
             env:
+                - MAKE_TASK=pio-test
                 - COMPILER=g++-5
-                - MAKE_TASK=cmake-test
                 - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
             addons:
                 apt:
@@ -26,8 +26,8 @@ matrix:
         -
             compiler: gcc
             env:
-                - COMPILER=g++-5
                 - MAKE_TASK=cmake-test
+                - COMPILER=g++-5
                 - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
             addons:
                 apt:
@@ -67,4 +67,4 @@ matrix:
                         - llvm-toolchain-precise-3.6
 
 script:
-    - "make $MAKE_TASKS"
+    - "make $MAKE_TASK"
