@@ -25,6 +25,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>
+#include "avr/interrupt.h"
+
 
 #include "binary.h"
 
