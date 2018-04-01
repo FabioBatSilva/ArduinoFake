@@ -4,24 +4,37 @@ dist: trusty
 group: beta
 language: cpp
 
-install:
-    - curl -fsSL https://bootstrap.pypa.io/get-pip.py | python
-    - python -m pip install platformio
+before_install:
+    - python -m pip install --user --upgrade pip
+    - python -m pip install --user --upgrade platformio
 
 matrix:
     include:
-        -
-            compiler: gcc
-            env:
-                - MAKE_TASK=pio-test
-                - COMPILER=g++-5
-            addons:
-                apt:
-                    packages:
-                        - git
-                        - g++-5
-                    sources:
-                        - ubuntu-toolchain-r-test
+        # -
+        #     compiler: gcc
+        #     env:
+        #         - MAKE_TASK=pio-test
+        #         - COMPILER=g++-5
+        #     addons:
+        #         apt:
+        #             packages:
+        #                 - git
+        #                 - g++-5
+        #             sources:
+        #                 - ubuntu-toolchain-r-test
+        # -
+        #     compiler: clang
+        #     env:
+        #         - MAKE_TASK=pio-test
+        #         - COMPILER=clang++-3.6
+        #     addons:
+        #         apt:
+        #             packages:
+        #                 - git
+        #                 - clang-3.6
+        #             sources:
+        #                 - ubuntu-toolchain-r-test
+        #                 - llvm-toolchain-precise-3.6
         -
             compiler: gcc
             env:
@@ -34,20 +47,6 @@ matrix:
                         - g++-5
                     sources:
                         - ubuntu-toolchain-r-test
-
-        -
-            compiler: clang
-            env:
-                - MAKE_TASK=pio-test
-                - COMPILER=clang++-3.6
-            addons:
-                apt:
-                    packages:
-                        - git
-                        - clang-3.6
-                    sources:
-                        - ubuntu-toolchain-r-test
-                        - llvm-toolchain-precise-3.6
         -
             compiler: clang
             env:
