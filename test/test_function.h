@@ -91,6 +91,35 @@ namespace FunctionTest
         Verify(Method(ArduinoFake(), detachInterrupt).Using(1)).Once();
     }
 
+    void test_attach(void)
+    {
+        When(Method(ArduinoFake(), attachInterrupt)).AlwaysReturn();
+
+        attachInterrupt(1, (void (*)(void))NULL, FALLING);
+        attachInterrupt(2, (void (*)(void))NULL, CHANGE);
+        attachInterrupt(3, (void (*)(void))NULL, RISING);
+
+        Verify(Method(ArduinoFake(), attachInterrupt)).Exactly(3);
+    }
+
+    void test_cli(void)
+    {
+        When(Method(ArduinoFake(), cli)).AlwaysReturn();
+
+        cli();
+
+        Verify(Method(ArduinoFake(), cli)).Once();
+    }
+
+    void test_sei(void)
+    {
+        When(Method(ArduinoFake(), sei)).AlwaysReturn();
+
+        sei();
+
+        Verify(Method(ArduinoFake(), sei)).Once();
+    }
+
     void test_random(void)
     {
         When(Method(ArduinoFake(), randomSeed)).AlwaysReturn();
@@ -152,6 +181,9 @@ namespace FunctionTest
         RUN_TEST(FunctionTest::test_analog_pin);
         RUN_TEST(FunctionTest::test_delay);
         RUN_TEST(FunctionTest::test_detach);
+        RUN_TEST(FunctionTest::test_attach);
+        RUN_TEST(FunctionTest::test_cli);        
+        RUN_TEST(FunctionTest::test_sei);
         RUN_TEST(FunctionTest::test_pulsein);
         RUN_TEST(FunctionTest::test_shift);
         RUN_TEST(FunctionTest::test_random);

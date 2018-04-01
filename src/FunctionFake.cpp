@@ -74,6 +74,18 @@ void detachInterrupt(uint8_t interruptNum) {
     ArduinoFakeInstance(Function)->detachInterrupt(interruptNum);
 }
 
+void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
+	ArduinoFakeInstance(Function)->attachInterrupt(interruptNum, userFunc, mode);
+}
+
+void cli(void) {
+    ArduinoFakeInstance(Function)->cli();
+}
+
+void sei(void) {
+    ArduinoFakeInstance(Function)->sei();
+}
+
 void tone(uint8_t pin, unsigned int frequency, unsigned long duration)
 {
     ArduinoFakeInstance(Function)->tone(pin, frequency, duration);
