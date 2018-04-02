@@ -58,4 +58,4 @@ Checkout the [examples](./examples) for many more examples!
 Or take a look at the [tests](./test)
 
 # Contributing
-If you want to extend Arduino Fake library to add missing functions (for example  `attachInterrupt`) see [contribution guidelines](CONTRIBUTING.md).
+If you want to extend `ArduinoFake` library to add missing functions (for example  `attachInterrupt`) see [contribution guidelines](CONTRIBUTING.md).
