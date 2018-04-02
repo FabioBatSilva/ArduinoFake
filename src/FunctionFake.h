@@ -29,6 +29,9 @@ struct FunctionFake
     virtual uint8_t shiftIn(uint8_t, uint8_t, uint8_t) = 0;
 
     virtual void detachInterrupt(uint8_t) = 0;
+    virtual void attachInterrupt(uint8_t, void (*)(void), int mode) = 0;
+    virtual void cli() = 0;
+    virtual void sei() = 0;
 
     virtual void tone(uint8_t _pin, unsigned int frequency, unsigned long duration) = 0;
     virtual void noTone(uint8_t _pin) = 0;

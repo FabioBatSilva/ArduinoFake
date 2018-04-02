@@ -56,3 +56,6 @@ void test_loop(void)
 
 Checkout the [examples](./examples) for many more examples!
 Or take a look at the [tests](./test)
+
+# Contributing
+If you want to extend `ArduinoFake` library to add missing functions (for example  `attachInterrupt`) see [contribution guidelines](CONTRIBUTING.md).
