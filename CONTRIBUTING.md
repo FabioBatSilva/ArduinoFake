@@ -2,7 +2,7 @@
 This is a step-by-step guide for contributors.
 
 ## Adding missing function
-I was missing `sei()`, `cli()` and `attachInterrupt()` in ArduinoFake, here is list of steps I did.
+I was missing `sei()`, `cli()` and `attachInterrupt()` in `ArduinoFake`, here is list of steps I did.
 
 
 1. add definitions of new functions in [src/arduino/Arduino.h](/src/arduino/Arduino.h), check if your function is in [Arduino.h](/src/arduino/Arduino.h). There are two situations: 
