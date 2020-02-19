@@ -49,6 +49,15 @@ namespace FunctionTest
         Verify(Method(ArduinoFake(), analogRead).Using(4)).Once();
     }
 
+    void test_yield(void)
+    {
+        When(Method(ArduinoFake(), yield)).AlwaysReturn();
+
+        yield();
+
+        Verify(Method(ArduinoFake(), yield)).Once();
+    }
+
     void test_delay(void)
     {
         When(Method(ArduinoFake(), delay)).AlwaysReturn();

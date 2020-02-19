@@ -115,3 +115,8 @@ long map(long value, long fromLow, long fromHigh, long toLow, long toHigh)
 {
     return ArduinoFakeInstance(Function)->map(value, fromLow, fromHigh, toLow, toHigh);
 }
+
+void yield()
+{
+    ArduinoFakeInstance(Function)->yield();
+}

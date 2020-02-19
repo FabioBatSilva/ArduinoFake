@@ -41,4 +41,6 @@ struct FunctionFake
     virtual void randomSeed(unsigned long) = 0;
 
     virtual long map(long, long, long, long, long) = 0;
+
+    virtual void yield() = 0;
 };
