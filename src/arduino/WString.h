@@ -21,6 +21,10 @@
 
 #ifndef String_class_h
 #define String_class_h
+
+#include "pgmspace.h"
+#include "noniso.h"
+
 #ifdef __cplusplus
 
 

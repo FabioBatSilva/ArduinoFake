@@ -11,6 +11,7 @@ using namespace fakeit;
 #include "test_serial.h"
 #include "test_client.h"
 #include "test_arduino_string.h"
+#include "test_include.h"
 
 #ifdef UNIT_TEST
 
@@ -36,6 +37,7 @@ int main(int argc, char **argv)
     RUN_TEST_GROUP(StreamTest);
     RUN_TEST_GROUP(SerialTest);
     RUN_TEST_GROUP(ClientTest);
+    RUN_TEST_GROUP(IncludeTest);
 
     UNITY_END();
 

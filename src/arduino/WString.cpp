@@ -20,8 +20,6 @@
 */
 
 #include "WString.h"
-#include "pgmspace.h"
-#include "noniso.h"
 
 /*********************************************/
 /*  Constructors                             */
