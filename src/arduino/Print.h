@@ -69,6 +69,7 @@ class Print
     size_t print(unsigned long, int = DEC);
     size_t print(double, int = 2);
     size_t print(const Printable&);
+    size_t printf(const char * format, ...)  __attribute__ ((format (printf, 2, 3)));
 
     size_t println(const __FlashStringHelper *);
     size_t println(const String &s);
