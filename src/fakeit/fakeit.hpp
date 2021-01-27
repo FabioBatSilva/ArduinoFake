@@ -6189,7 +6189,7 @@ namespace fakeit {
     struct DefaultValue<C, typename std::enable_if<!is_constructible_type<C>::value>::type> {
         static C &value() {
             if (std::is_reference<C>::value) {
-                typename naked_type<C>::type *ptr = nullptr;
+                typename naked_type<C>::type *ptr = NULL;
                 return *ptr;
             }
 
