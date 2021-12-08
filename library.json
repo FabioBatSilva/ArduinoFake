@@ -1,6 +1,6 @@
 {
   "name": "ArduinoFake",
-  "version": "0.2.2",
+  "version": "0.3.1",
   "keywords": "test, mock, fake, arduino",
   "description": "Arduino mocking made easy.",
   "repository": {
