@@ -948,6 +948,17 @@ namespace fakeit {
     };
 }
 namespace fakeit {
+#if __cplusplus >= 201703L || defined(__cpp_lib_uncaught_exceptions)
+    inline bool UncaughtException()
+    {
+        return std::uncaught_exceptions() >= 1;
+    }
+#else
+    inline bool UncaughtException()
+    {
+        return std::uncaught_exception();
+    }
+#endif
 
     struct FakeitException {
         std::exception err;
@@ -8360,7 +8371,7 @@ namespace fakeit {
 
             virtual ~StubbingChange() THROWS {
 
-                if (std::uncaught_exception()) {
+                if (UncaughtException()) {
                     return;
                 }
 
@@ -8620,7 +8631,7 @@ namespace fakeit {
         friend class SequenceVerificationProgress;
 
         ~SequenceVerificationExpectation() THROWS {
-            if (std::uncaught_exception()) {
+            if (UncaughtException()) {
                 return;
             }
             VerifyExpectation(_fakeit);
@@ -8982,7 +8993,7 @@ namespace fakeit {
             friend class VerifyNoOtherInvocationsVerificationProgress;
 
             ~VerifyNoOtherInvocationsExpectation() THROWS {
-                if (std::uncaught_exception()) {
+                if (UncaughtException()) {
                     return;
                 }
 
