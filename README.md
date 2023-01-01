@@ -57,5 +57,15 @@ void test_loop(void)
 Checkout the [examples](./examples) for many more examples!
 Or take a look at the [tests](./test)
 
+## Troubleshooting
+
+If you get a segfault while running your unit tests, eg:
+
+```
+Program errored with 3221225477 code
+```
+
+Check to make sure you have stubbed **all** the Arduino methods you are calling.
+
 # Contributing
 If you want to extend `ArduinoFake` library to add missing functions (for example  `attachInterrupt`) see [contribution guidelines](CONTRIBUTING.md).
