@@ -26,3 +26,4 @@ cmake-test: build test
 clean:
 	@rm -rf $(CURDIR)/build/*
 	@rm -rf $(CURDIR)/.pioenvs/*
+	@rm -rf $(CURDIR)/.pio/*
