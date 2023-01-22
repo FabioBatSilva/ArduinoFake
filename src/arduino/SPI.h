@@ -70,10 +70,20 @@
 #endif
 
 class SPISettings {
+ private:
+  uint32_t clock;
+  uint8_t bitOrder;
+  uint8_t dataMode;
+
  public:
-  SPISettings(uint32_t clock, uint8_t bitOrder, uint8_t dataMode) {}
+  SPISettings(uint32_t clock, uint8_t bitOrder, uint8_t dataMode): clock(clock), bitOrder(bitOrder), dataMode(dataMode) {}
   SPISettings() { SPISettings(4000000, MSBFIRST, SPI_MODE0); }
   friend class SPIClass;
+
+  bool operator==(const SPISettings &other) const {
+    return (clock == other.clock) && (bitOrder == other.bitOrder) &&
+           (dataMode == other.dataMode);
+  }
 };
 
 class SPIClass {
