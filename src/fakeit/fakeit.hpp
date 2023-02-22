@@ -7,10 +7,6 @@
  *  https://github.com/eranpeer/FakeIt
  */
 
-
-
-
-
 #include <functional>
 #include <memory>
 #include <set>
@@ -30,6 +26,10 @@
 #include <iosfwd>
 #include <atomic>
 #include <tuple>
+
+#if defined(__cplusplus) && __cplusplus >= 201703L
+// replace deprecated std::uncaught_exception() with with uncaught_exceptions() for gnu++17 support 
+#endif 
 
 
 namespace fakeit {
@@ -8360,9 +8360,16 @@ namespace fakeit {
 
             virtual ~StubbingChange() THROWS {
 
+                #if defined(__cplusplus) && __cplusplus >= 201703L
+                if (std::uncaught_exceptions()) {
+                    return;
+                }
+                #else
                 if (std::uncaught_exception()) {
                     return;
                 }
+                #endif 
+                
 
                 _xaction.commit();
             }
@@ -8620,9 +8627,15 @@ namespace fakeit {
         friend class SequenceVerificationProgress;
 
         ~SequenceVerificationExpectation() THROWS {
+            #if defined(__cplusplus) && __cplusplus >= 201703L
+            if (std::uncaught_exceptions()) {
+                return;
+            }
+            #else
             if (std::uncaught_exception()) {
                 return;
             }
+            #endif 
             VerifyExpectation(_fakeit);
         }
 
@@ -8982,9 +8995,15 @@ namespace fakeit {
             friend class VerifyNoOtherInvocationsVerificationProgress;
 
             ~VerifyNoOtherInvocationsExpectation() THROWS {
+                #if defined(__cplusplus) && __cplusplus >= 201703L
+                if (std::uncaught_exceptions()) {
+                    return;
+                }
+                #else
                 if (std::uncaught_exception()) {
                     return;
                 }
+                #endif 
 
                 VerifyExpectation(_fakeit);
             }
