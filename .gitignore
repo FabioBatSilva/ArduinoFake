@@ -12,3 +12,6 @@
 /Testing/*
 .pio/*
 .vscode/*
+/test/test_main.cpp
+output.txt
+error.txt
