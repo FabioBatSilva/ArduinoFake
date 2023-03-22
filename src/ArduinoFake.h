@@ -12,13 +12,13 @@
 
 #include "arduino/Arduino.h"
 
-#include "FunctionFake.h"
-#include "StreamFake.h"
-#include "SerialFake.h"
-#include "WireFake.h"
-#include "ClientFake.h"
-#include "PrintFake.h"
-#include "SPIFake.h"
+#include "Function.h"
+#include "Stream.h"
+#include "Serial.h"
+#include "Wire.h"
+#include "Client.h"
+#include "Print.h"
+#include "SPI.h"
 
 #define ArduinoFake(mock) _ArduinoFakeGet##mock()
 
