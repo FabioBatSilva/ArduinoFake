@@ -1,4 +1,5 @@
 #pragma once
+// clang-format off
 
 #if !defined(UBRRH) && !defined(UBRR0H) && !defined(USBCON)
     #define USBCON
@@ -19,6 +20,7 @@
 #include "Client.h"
 #include "Print.h"
 #include "SPI.h"
+#include "EEPROM.h"
 
 #define ArduinoFake(mock) _ArduinoFakeGet##mock()
 
@@ -38,6 +40,7 @@
 #define _ArduinoFakeGetSerial() _ArduinoFakeGetMock(Serial)
 #define _ArduinoFakeGetWire() _ArduinoFakeGetMock(Wire)
 #define _ArduinoFakeGetSPI() _ArduinoFakeGetMock(SPI)
+#define _ArduinoFakeGetEEPROM() _ArduinoFakeGetMock(EEPROM)
 #define _ArduinoFakeGetStream() _ArduinoFakeGetMock(Stream)
 #define _ArduinoFakeGetClient() _ArduinoFakeGetMock(Client)
 #define _ArduinoFakeGetPrint() _ArduinoFakeGetMock(Print)
@@ -73,6 +76,7 @@ struct ArduinoFakeMocks
     fakeit::Mock<ClientFake> Client;
     fakeit::Mock<PrintFake> Print;
     fakeit::Mock<SPIFake> SPI;
+    fakeit::Mock<EEPROMFake> EEPROM;
 };
 
 struct ArduinoFakeInstances
@@ -84,6 +88,7 @@ struct ArduinoFakeInstances
     ClientFake* Client;
     PrintFake* Print;
     SPIFake* SPI;
+    EEPROMFake* EEPROM;
 };
 
 class ArduinoFakeContext
@@ -100,6 +105,7 @@ class ArduinoFakeContext
         _ArduinoFakeInstanceGetter1(Client)
         _ArduinoFakeInstanceGetter1(Function)
         _ArduinoFakeInstanceGetter1(SPI)
+        _ArduinoFakeInstanceGetter1(EEPROM)
 
         _ArduinoFakeInstanceGetter2(Print, Print)
         _ArduinoFakeInstanceGetter2(Client, Client)
@@ -107,6 +113,7 @@ class ArduinoFakeContext
         _ArduinoFakeInstanceGetter2(Serial, Serial_)
         _ArduinoFakeInstanceGetter2(Wire, TwoWire)
         _ArduinoFakeInstanceGetter2(SPI, SPIClass)
+        _ArduinoFakeInstanceGetter2(EEPROM, EEPROMClass)
 
         ArduinoFakeContext()
         {
@@ -124,11 +131,15 @@ class ArduinoFakeContext
             this->Mocks->Client.Reset();
             this->Mocks->Print.Reset();
             this->Mocks->SPI.Reset();
+            this->Mocks->EEPROM.Reset();
 
             Mapping[&::Serial] = this->Serial();
             Mapping[&::Wire] = this->Wire();
             Mapping[&::SPI] = this->SPI();
+            Mapping[&::EEPROM] = this->EEPROM();
         }
 };
 
 ArduinoFakeContext* getArduinoFakeContext();
+
+// clang-format on

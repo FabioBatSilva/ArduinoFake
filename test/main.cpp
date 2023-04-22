@@ -1,3 +1,4 @@
+// clang-format off
 #include <Arduino.h>
 #include <cstdlib>
 #include <unity.h>
@@ -11,6 +12,7 @@ using namespace fakeit;
 #include "test_serial.h"
 #include "test_wire.h"
 #include "test_spi.h"
+#include "test_eeprom.h"
 #include "test_client.h"
 #include "test_arduino_string.h"
 #include "test_include.h"
@@ -40,6 +42,7 @@ int main(int argc, char **argv)
     RUN_TEST_GROUP(SerialTest);
     RUN_TEST_GROUP(WireTest);
     RUN_TEST_GROUP(SpiTest);
+    RUN_TEST_GROUP(EEPROMTest);
     RUN_TEST_GROUP(ClientTest);
     RUN_TEST_GROUP(IncludeTest);
 
@@ -49,3 +52,4 @@ int main(int argc, char **argv)
 }
 
 #endif
+// clang-format on
