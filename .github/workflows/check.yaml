@@ -15,4 +15,4 @@ jobs:
         uses: actions/checkout@v2
       -
         name: Tests
-        run: make -V
+        run: make
