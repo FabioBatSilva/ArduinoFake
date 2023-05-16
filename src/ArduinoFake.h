@@ -4,11 +4,11 @@
     #define USBCON
 #endif
 
-#include <map>
+#include <unordered_map>  
 #include <cstring>
 #include <cstdint>
 #include <stdexcept>
-#include "fakeit/fakeit.hpp"
+#include <fakeit.hpp>
 
 #include "arduino/Arduino.h"
 
@@ -91,7 +91,7 @@ class ArduinoFakeContext
     public:
         ArduinoFakeInstances* Instances = new ArduinoFakeInstances();
         ArduinoFakeMocks* Mocks = new ArduinoFakeMocks();
-        std::map<void*, void*> Mapping;
+        std::unordered_map<void*, void*> Mapping;
 
         _ArduinoFakeInstanceGetter1(Print)
         _ArduinoFakeInstanceGetter1(Stream)

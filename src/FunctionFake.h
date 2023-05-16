@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fakeit/fakeit.hpp"
+#include <fakeit.hpp>
 
 struct FunctionFake
 {
