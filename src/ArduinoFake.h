@@ -8,7 +8,7 @@
 #include <cstring>
 #include <cstdint>
 #include <stdexcept>
-#include "fakeit.hpp"
+#include <fakeit.hpp>
 
 #include "arduino/Arduino.h"
 
