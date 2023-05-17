@@ -6,7 +6,7 @@ namespace PrintTest
     {
         char char_var = 'A';
         unsigned char unsigned_char_var = 'B';
-        const char char_array_var[] = "char_array_var";
+        const char *char_array_var = "char_array_var";
 
         int int_var = 123;
         long long_var = 12345678;
@@ -51,7 +51,7 @@ namespace PrintTest
     {
         char char_var = 'A';
         unsigned char unsigned_char_var = 'B';
-        const char char_array_var[] = "char_array_var";
+        const char *char_array_var = "char_array_var";
 
         int int_var = 123;
         long long_var = 12345678;
