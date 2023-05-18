@@ -27,3 +27,8 @@ clean:
 	@rm -rf $(CURDIR)/build/*
 	@rm -rf $(CURDIR)/.pioenvs/*
 	@rm -rf $(CURDIR)/.pio/*
+
+.PHONY: deploy
+deploy:
+	cp $(CURDIR)/external/fakeit/fakeit-repo/single_header/standalone/* $(CURDIR)/src
+
