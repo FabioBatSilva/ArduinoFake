@@ -20,6 +20,6 @@
   "frameworks": "arduino",
   "platforms": "native",
   "dependencies": {
-    "FakeIt": "https://eranpeer/FakeIt.git#2.4.0"
+    "FakeIt": "https://github.com/eranpeer/FakeIt.git#2.4.0"
   }
 }
