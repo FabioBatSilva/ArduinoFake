@@ -2,7 +2,7 @@
 /*
  *  FakeIt - A Simplified C++ Mocking Framework
  *  Copyright (c) Eran Pe'er 2013
- *  Generated: 2023-04-17 21:28:52.363853
+ *  Generated: 2021-03-20 16:12:26.429244
  *  Distributed under the MIT License. Please refer to the LICENSE file at:
  *  https://github.com/eranpeer/FakeIt
  */
@@ -17,23 +17,11 @@
 #include <vector>
 #include <stdexcept>
 #if defined (__GNUG__) || _MSC_VER >= 1900
-#   define FAKEIT_THROWS noexcept(false)
-#   define FAKEIT_NO_THROWS noexcept(true)
+#define THROWS noexcept(false)
+#define NO_THROWS noexcept(true)
 #elif defined (_MSC_VER)
-#   define FAKEIT_THROWS throw(...)
-#   define FAKEIT_NO_THROWS
-#endif
-
-#ifdef _MSVC_LANG
-#   define FAKEIT_CPLUSPLUS _MSVC_LANG
-#else
-#   define FAKEIT_CPLUSPLUS __cplusplus
-#endif
-
-#ifdef __GNUG__
-#   define FAKEIT_DISARM_UBSAN __attribute__((no_sanitize("undefined")))
-#else
-#   define FAKEIT_DISARM_UBSAN
+#define THROWS throw(...)
+#define NO_THROWS
 #endif
 #include <typeinfo>
 #include <unordered_set>
@@ -45,14 +33,6 @@
 
 
 namespace fakeit {
-
-    template<class...>
-    using fk_void_t = void;
-
-    template <bool...> struct bool_pack;
-
-    template <bool... v>
-    using all_true = std::is_same<bool_pack<true, v...>, bool_pack<v..., true>>;
 
     template<class C>
     struct naked_type {
@@ -81,11 +61,11 @@ namespace fakeit {
     class is_ostreamable {
         struct no {};
 #if defined(_MSC_VER) && _MSC_VER < 1900
-        template <typename Type1>
-        static decltype(operator<<(std::declval<std::ostream&>(), std::declval<const Type1>())) test(std::ostream &s, const Type1 &t);
+        template <typename T1>
+        static decltype(operator<<(std::declval<std::ostream&>(), std::declval<const T1>())) test(std::ostream &s, const T1 &t);
 #else
-        template <typename Type1>
-        static auto test(std::ostream &s, const Type1 &t) -> decltype(s << t);
+        template <typename T1>
+        static auto test(std::ostream &s, const T1 &t) -> decltype(s << t);
 #endif
         static no test(...);
     public:
@@ -124,15 +104,6 @@ namespace fakeit {
         typedef R(__thiscall *type)(void *, arglist...);
 #endif
     };
-
-    template<template<typename>class test, typename T>
-    struct smart_test : test<T> {};
-
-    template<template<typename>class test, typename T, typename A>
-    struct smart_test <test, std::vector<T, A>> : smart_test < test, T> {};
-
-    template<typename T>
-    using smart_is_copy_constructible = smart_test < std::is_copy_constructible, T >;
 }
 #include <typeinfo>
 #include <tuple>
@@ -147,7 +118,7 @@ namespace fakeit {
 
     template<typename C>
     struct MockObject {
-        virtual ~MockObject() FAKEIT_THROWS { };
+        virtual ~MockObject() THROWS { };
 
         virtual C &get() = 0;
 
@@ -209,7 +180,7 @@ namespace fakeit {
 
         struct Matcher {
 
-            virtual ~Matcher() FAKEIT_THROWS {
+            virtual ~Matcher() THROWS {
             }
 
             virtual bool matches(Invocation &invocation) = 0;
@@ -435,13 +406,13 @@ namespace fakeit {
 	struct ActualInvocationsContainer {
 		virtual void clear() = 0;
 
-		virtual ~ActualInvocationsContainer() FAKEIT_NO_THROWS { }
+		virtual ~ActualInvocationsContainer() NO_THROWS { }
 	};
 
     struct ActualInvocationsSource {
         virtual void getActualInvocations(std::unordered_set<fakeit::Invocation *> &into) const = 0;
 
-        virtual ~ActualInvocationsSource() FAKEIT_NO_THROWS { }
+        virtual ~ActualInvocationsSource() NO_THROWS { }
     };
 
     struct InvocationsSourceProxy : public ActualInvocationsSource {
@@ -518,7 +489,7 @@ namespace fakeit {
         Sequence() {
         }
 
-        virtual ~Sequence() FAKEIT_THROWS {
+        virtual ~Sequence() THROWS {
         }
 
     public:
@@ -1014,9 +985,8 @@ namespace fakeit {
 #include <exception>
 
 
-
 namespace fakeit {
-#if FAKEIT_CPLUSPLUS >= 201703L || defined(__cpp_lib_uncaught_exceptions)
+#if __cplusplus >= 201703L
     inline bool UncaughtException () {
         return std::uncaught_exceptions() >= 1;
     }
@@ -1164,7 +1134,7 @@ namespace fakeit {
 namespace fakeit {
 
     struct VerificationException : public std::exception {
-        virtual ~VerificationException() FAKEIT_NO_THROWS{};
+        virtual ~VerificationException() NO_THROWS{};
 
         VerificationException(std::string format) :
             _format(format) {
@@ -1191,7 +1161,7 @@ namespace fakeit {
             return _callingMethod;
         }
 
-        const char* what() const FAKEIT_NO_THROWS override{
+        const char* what() const NO_THROWS override{
             return _format.c_str();
         }
     private:
@@ -5315,21 +5285,15 @@ namespace fakeit {
 
     };
 }
-#if defined(__GNUG__) && !defined(__clang__)
-#define FAKEIT_NO_DEVIRTUALIZE_ATTR [[gnu::optimize("no-devirtualize")]]
-#else
-#define FAKEIT_NO_DEVIRTUALIZE_ATTR
-#endif
-
 namespace fakeit {
 
-    template<typename TargetType, typename SourceType>
-    FAKEIT_NO_DEVIRTUALIZE_ATTR
-    TargetType union_cast(SourceType source) {
+    template<typename TARGET, typename SOURCE>
+    [[gnu::optimize("no-devirtualize")]]
+    TARGET union_cast(SOURCE source) {
 
         union {
-            SourceType source;
-            TargetType target;
+            SOURCE source;
+            TARGET target;
         } u;
         u.source = source;
         return u.target;
@@ -5346,22 +5310,17 @@ namespace fakeit {
     class VTUtils {
     public:
 
-#if defined(__GNUG__) && !defined(__clang__) && __GNUC__ >= 8
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-function-type"
-#endif
         template<typename C, typename R, typename ... arglist>
         static unsigned int getOffset(R (C::*vMethod)(arglist...)) {
             auto sMethod = reinterpret_cast<unsigned int (VirtualOffsetSelector::*)(int)>(vMethod);
             VirtualOffsetSelector offsetSelctor;
             return (offsetSelctor.*sMethod)(0);
         }
-#if defined(__GNUG__) && !defined(__clang__) && __GNUC__ >= 8
 #pragma GCC diagnostic pop
-#endif
 
         template<typename C>
-        FAKEIT_DISARM_UBSAN
         static typename std::enable_if<std::has_virtual_destructor<C>::value, unsigned int>::type
         getDestructorOffset() {
             VirtualOffsetSelector offsetSelctor;
@@ -5421,7 +5380,7 @@ namespace fakeit {
         char name[8];
     };
 
-    struct PmdInfo {
+    struct PMD {
 
 
 
@@ -5430,7 +5389,7 @@ namespace fakeit {
         int pdisp;
         int vdisp;
 
-        PmdInfo() :
+        PMD() :
                 mdisp(0), pdisp(-1), vdisp(0) {
         }
     };
@@ -5442,7 +5401,7 @@ namespace fakeit {
 
         const std::type_info *pTypeDescriptor;
         dword_ numContainedBases;
-        struct PmdInfo where;
+        struct PMD where;
         dword_ attributes;
     };
 
@@ -5482,11 +5441,11 @@ namespace fakeit {
             numBaseClasses++;
         }
 
-        template<typename head, typename Base1, typename... tail>
+        template<typename head, typename B1, typename... tail>
         void addBaseClass() {
-            static_assert(std::is_base_of<Base1, head>::value, "invalid inheritance list");
+            static_assert(std::is_base_of<B1, head>::value, "invalid inheritance list");
             addBaseClass<head>();
-            addBaseClass<Base1, tail...>();
+            addBaseClass<B1, tail...>();
         }
 
     };
@@ -5584,8 +5543,6 @@ namespace fakeit {
             for (unsigned int i = 0; i < size; i++) {
                 _firstMethod[i] = from.getMethod(i);
             }
-            if (VTUtils::hasVirtualDestructor<C>())
-                setCookie(dtorCookieIndex, from.getCookie(dtorCookieIndex));
         }
 
         VirtualTable() : VirtualTable(buildVTArray()) {
@@ -5608,7 +5565,7 @@ namespace fakeit {
             C *c = (C *) this;
             C &cRef = *c;
             auto vt = VirtualTable<C, baseclasses...>::getVTable(cRef);
-            void *dtorPtr = vt.getCookie(dtorCookieIndex);
+            void *dtorPtr = vt.getCookie(numOfCookies - 1);
             void(*method)(C *) = reinterpret_cast<void (*)(C *)>(dtorPtr);
             method(c);
             return 0;
@@ -5623,7 +5580,7 @@ namespace fakeit {
             void *dtorPtr = union_cast<void *>(&VirtualTable<C, baseclasses...>::dtor);
             unsigned int index = VTUtils::getDestructorOffset<C>();
             _firstMethod[index] = dtorPtr;
-            setCookie(dtorCookieIndex, method);
+            setCookie(numOfCookies - 1, method);
         }
 
         unsigned int getSize() {
@@ -5650,7 +5607,6 @@ namespace fakeit {
         static_assert(sizeof(unsigned int (SimpleType::*)()) == sizeof(unsigned int (C::*)()),
             "Can't mock a type with multiple inheritance or with non-polymorphic base class");
         static const unsigned int numOfCookies = 3;
-        static const unsigned int dtorCookieIndex = numOfCookies - 1;
 
         static void **buildVTArray() {
             int vtSize = VTUtils::getVTSize<C>();
@@ -5673,17 +5629,17 @@ namespace fakeit {
 #include <tr2/type_traits>
 
 namespace fakeit {
-    template<typename ... Type1>
+    template<typename ... T1>
     class has_one_base {
     };
 
-    template<typename Type1, typename Type2, typename ... types>
-    class has_one_base<std::tr2::__reflection_typelist<Type1, Type2, types...>> : public std::false_type {
+    template<typename T1, typename T2, typename ... types>
+    class has_one_base<std::tr2::__reflection_typelist<T1, T2, types...>> : public std::false_type {
     };
 
-    template<typename Type1>
-    class has_one_base<std::tr2::__reflection_typelist<Type1>>
-            : public has_one_base<typename std::tr2::direct_bases<Type1>::type> {
+    template<typename T1>
+    class has_one_base<std::tr2::__reflection_typelist<T1>>
+            : public has_one_base<typename std::tr2::direct_bases<T1>::type> {
     };
 
     template<>
@@ -5851,104 +5807,74 @@ namespace fakeit {
 }
 #include <new>
 
-
-namespace fakeit
-{
-    namespace details
-    {
-        template <int instanceAreaSize, typename C, typename... BaseClasses>
-        class FakeObjectImpl
-        {
-        public:
-            void initializeDataMembersArea()
-            {
-                for (size_t i = 0; i < instanceAreaSize; ++i)
-                {
-                    instanceArea[i] = (char) 0;
-                }
-            }
-
-        protected:
-            VirtualTable<C, BaseClasses...> vtable;
-            char instanceArea[instanceAreaSize];
-        };
-
-        template <typename C, typename... BaseClasses>
-        class FakeObjectImpl<0, C, BaseClasses...>
-        {
-        public:
-            void initializeDataMembersArea()
-            {}
-
-        protected:
-            VirtualTable<C, BaseClasses...> vtable;
-        };
-    }
-
-    template <typename C, typename... BaseClasses>
-    class FakeObject
-        : public details::FakeObjectImpl<sizeof(C) - sizeof(VirtualTable<C, BaseClasses...>), C, BaseClasses...>
-    {
-        FakeObject(FakeObject const&) = delete;
-        FakeObject& operator=(FakeObject const&) = delete;
-
-    public:
-        FakeObject()
-        {
-            this->initializeDataMembersArea();
-        }
-
-        ~FakeObject()
-        {
-            this->vtable.dispose();
-        }
-
-        void setMethod(unsigned int index, void* method)
-        {
-            this->vtable.setMethod(index, method);
-        }
-
-        VirtualTable<C, BaseClasses...>& getVirtualTable()
-        {
-            return this->vtable;
-        }
-
-        void setVirtualTable(VirtualTable<C, BaseClasses...>& t)
-        {
-            this->vtable = t;
-        }
-
-        void setDtor(void* dtor)
-        {
-            this->vtable.setDtor(dtor);
-        }
-    };
-}
-#include <functional>
-
 namespace fakeit {
 
-    class Finally {
-    private:
-        std::function<void()> _finallyClause;
+#ifdef __GNUG__
+#ifndef __clang__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+#endif
+#endif
 
-        Finally(const Finally &) = delete;
 
-        Finally &operator=(const Finally &) = delete;
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4200 )
+#endif
+
+
+    template<typename C, typename ... baseclasses>
+    class FakeObject {
+
+        VirtualTable<C, baseclasses...> vtable;
+
+        static const size_t SIZE = sizeof(C) - sizeof(VirtualTable<C, baseclasses...>);
+        char instanceArea[SIZE ? SIZE : 0];
+
+        FakeObject(FakeObject const &) = delete;
+        FakeObject &operator=(FakeObject const &) = delete;
 
     public:
-        explicit Finally(std::function<void()> f) :
-                _finallyClause(f) {
+
+        FakeObject() : vtable() {
+            initializeDataMembersArea();
         }
 
-        Finally(Finally&& other) {
-             _finallyClause.swap(other._finallyClause);
+        ~FakeObject() {
+            vtable.dispose();
         }
 
-        ~Finally() {
-            _finallyClause();
+        void initializeDataMembersArea() {
+            for (size_t i = 0; i < SIZE; ++i) instanceArea[i] = (char) 0;
+        }
+
+        void setMethod(unsigned int index, void *method) {
+            vtable.setMethod(index, method);
+        }
+
+        VirtualTable<C, baseclasses...> &getVirtualTable() {
+            return vtable;
+        }
+
+        void setVirtualTable(VirtualTable<C, baseclasses...> &t) {
+            vtable = t;
+        }
+
+        void setDtor(void *dtor) {
+            vtable.setDtor(dtor);
         }
     };
+
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
+
+#ifdef __GNUG__
+#ifndef __clang__
+#pragma GCC diagnostic pop
+#endif
+#endif
+
 }
 namespace fakeit {
 
@@ -5984,14 +5910,14 @@ namespace fakeit {
 namespace fakeit {
 
     struct InvocationHandlerCollection {
-        static const unsigned int VtCookieIndex = 0;
+        static const unsigned int VT_COOKIE_INDEX = 0;
 
         virtual Destructible *getInvocatoinHandlerPtrById(unsigned int index) = 0;
 
         static InvocationHandlerCollection *getInvocationHandlerCollection(void *instance) {
             VirtualTableBase &vt = VirtualTableBase::getVTable(instance);
             InvocationHandlerCollection *invocationHandlerCollection = (InvocationHandlerCollection *) vt.getCookie(
-                    InvocationHandlerCollection::VtCookieIndex);
+                    InvocationHandlerCollection::VT_COOKIE_INDEX);
             return invocationHandlerCollection;
         }
     };
@@ -6009,11 +5935,6 @@ namespace fakeit {
             return MethodProxy(id, offset, union_cast<void *>(&MethodProxyCreator::methodProxyX < id > ));
         }
 
-        template<unsigned int id>
-        MethodProxy createMethodProxyStatic(unsigned int offset) {
-            return MethodProxy(id, offset, union_cast<void *>(&MethodProxyCreator::methodProxyXStatic < id > ));
-        }
-
     protected:
 
         R methodProxy(unsigned int id, const typename fakeit::production_arg<arglist>::type... args) {
@@ -6028,20 +5949,6 @@ namespace fakeit {
         template<int id>
         R methodProxyX(arglist ... args) {
             return methodProxy(id, std::forward<const typename fakeit::production_arg<arglist>::type>(args)...);
-        }
-
-        static R methodProxyStatic(void* instance, unsigned int id, const typename fakeit::production_arg<arglist>::type... args) {
-            InvocationHandlerCollection *invocationHandlerCollection = InvocationHandlerCollection::getInvocationHandlerCollection(
-                instance);
-            MethodInvocationHandler<R, arglist...> *invocationHandler =
-                (MethodInvocationHandler<R, arglist...> *) invocationHandlerCollection->getInvocatoinHandlerPtrById(
-                    id);
-            return invocationHandler->handleMethodInvocation(std::forward<const typename fakeit::production_arg<arglist>::type>(args)...);
-        }
-
-        template<int id>
-        static R methodProxyXStatic(void* instance, arglist ... args) {
-            return methodProxyStatic(instance, id, std::forward<const typename fakeit::production_arg<arglist>::type>(args)...);
         }
     };
 }
@@ -6094,7 +6001,7 @@ namespace fakeit {
                 _offsets(VTUtils::getVTSize<C>()),
                 _invocationHandlers(_methodMocks, _offsets) {
             _cloneVt.copyFrom(originalVtHandle.restore());
-            _cloneVt.setCookie(InvocationHandlerCollection::VtCookieIndex, &_invocationHandlers);
+            _cloneVt.setCookie(InvocationHandlerCollection::VT_COOKIE_INDEX, &_invocationHandlers);
             getFake().setVirtualTable(_cloneVt);
         }
 
@@ -6133,17 +6040,7 @@ namespace fakeit {
         void stubDtor(MethodInvocationHandler<void> *methodInvocationHandler) {
             auto offset = VTUtils::getDestructorOffset<C>();
             MethodProxyCreator<void> creator;
-
-
-
-
-
-
-#ifdef _MSC_VER
-            bindDtor(creator.createMethodProxyStatic<0>(offset), methodInvocationHandler);
-#else
             bindDtor(creator.createMethodProxy<0>(offset), methodInvocationHandler);
-#endif
         }
 
         template<typename R, typename ... arglist>
@@ -6170,21 +6067,21 @@ namespace fakeit {
             return ptr.get();
         }
 
-        template<typename DataType, typename ... arglist>
-        void stubDataMember(DataType C::*member, const arglist &... initargs) {
-            DataType C::*theMember = (DataType C::*) member;
+        template<typename DATA_TYPE, typename ... arglist>
+        void stubDataMember(DATA_TYPE C::*member, const arglist &... initargs) {
+            DATA_TYPE C::*theMember = (DATA_TYPE C::*) member;
             C &mock = get();
-            DataType *memberPtr = &(mock.*theMember);
+            DATA_TYPE *memberPtr = &(mock.*theMember);
             _members.push_back(
-                    std::shared_ptr<DataMemeberWrapper < DataType, arglist...> >
-                    {new DataMemeberWrapper < DataType, arglist...>(memberPtr,
+                    std::shared_ptr<DataMemeberWrapper < DATA_TYPE, arglist...> >
+                    {new DataMemeberWrapper < DATA_TYPE, arglist...>(memberPtr,
                     initargs...)});
         }
 
-        template<typename DataType>
-        void getMethodMocks(std::vector<DataType> &into) const {
+        template<typename DATA_TYPE>
+        void getMethodMocks(std::vector<DATA_TYPE> &into) const {
             for (std::shared_ptr<Destructible> ptr : _methodMocks) {
-                DataType p = dynamic_cast<DataType>(ptr.get());
+                DATA_TYPE p = dynamic_cast<DATA_TYPE>(ptr.get());
                 if (p) {
                     into.push_back(p);
                 }
@@ -6196,33 +6093,21 @@ namespace fakeit {
             return vt;
         }
 
-        template<typename R, typename ... arglist>
-        Finally createRaiiMethodSwapper(R(C::*vMethod)(arglist...)) {
-            auto offset = VTUtils::getOffset(vMethod);
-            auto fakeMethod = getFake().getVirtualTable().getMethod(offset);
-            auto originalMethod = getOriginalVT().getMethod(offset);
-
-            getFake().setMethod(offset, originalMethod);
-            return Finally{[&, offset, fakeMethod](){
-                getFake().setMethod(offset, fakeMethod);
-            }};
-        }
-
     private:
 
-        template<typename DataType, typename ... arglist>
+        template<typename DATA_TYPE, typename ... arglist>
         class DataMemeberWrapper : public Destructible {
         private:
-            DataType *dataMember;
+            DATA_TYPE *dataMember;
         public:
-            DataMemeberWrapper(DataType *dataMem, const arglist &... initargs) :
+            DataMemeberWrapper(DATA_TYPE *dataMem, const arglist &... initargs) :
                     dataMember(dataMem) {
-                new(dataMember) DataType{initargs ...};
+                new(dataMember) DATA_TYPE{initargs ...};
             }
 
             ~DataMemeberWrapper() override
             {
-                dataMember->~DataType();
+                dataMember->~DATA_TYPE();
             }
         };
 
@@ -6253,10 +6138,10 @@ namespace fakeit {
             _offsets[methodProxy.getOffset()] = methodProxy.getId();
         }
 
-        template<typename DataType>
-        DataType getMethodMock(unsigned int offset) {
+        template<typename DATA_TYPE>
+        DATA_TYPE getMethodMock(unsigned int offset) {
             std::shared_ptr<Destructible> ptr = _methodMocks[offset];
-            return dynamic_cast<DataType>(ptr.get());
+            return dynamic_cast<DATA_TYPE>(ptr.get());
         }
 
         template<typename BaseClass>
@@ -6506,10 +6391,6 @@ namespace fakeit {
     };
 
 }
-#include <cmath>
-#include <cstring>
-
-
 namespace fakeit {
 
     struct IMatcher : Destructible {
@@ -6517,584 +6398,281 @@ namespace fakeit {
         virtual std::string format() const = 0;
     };
 
-    template<typename ActualT>
+    template<typename T>
     struct TypedMatcher : IMatcher {
-        virtual bool matches(const ActualT &actual) const = 0;
+        virtual bool matches(const T &actual) const = 0;
     };
 
-    template<typename ExpectedTRef>
-    struct ComparisonMatcherCreatorBase {
-        using ExpectedT = typename naked_type<ExpectedTRef>::type;
+    template<typename T>
+    struct TypedMatcherCreator {
 
-        ExpectedTRef _expectedRef;
+        virtual ~TypedMatcherCreator() = default;
 
-        template <typename T>
-        ComparisonMatcherCreatorBase(T &&expectedRef)
-                : _expectedRef(std::forward<T>(expectedRef)) {
+        virtual TypedMatcher<T> *createMatcher() const = 0;
+    };
+
+    template<typename T>
+    struct ComparisonMatcherCreator : public TypedMatcherCreator<T> {
+
+        virtual ~ComparisonMatcherCreator() = default;
+
+        ComparisonMatcherCreator(const T &arg)
+                : _expected(arg) {
         }
 
-        template <typename ActualT, typename = ExpectedT, typename = void>
-        struct MatcherBase : public TypedMatcher<ActualT> {
-            const ExpectedT _expected;
-
-            MatcherBase(ExpectedTRef expected)
-                    : _expected{std::forward<ExpectedTRef>(expected)} {
+        struct Matcher : public TypedMatcher<T> {
+            Matcher(const T &expected)
+                    : _expected(expected) {
             }
+
+            const T _expected;
         };
 
-        template <typename ActualT, typename U>
-        struct MatcherBase<ActualT, U, typename std::enable_if<std::is_same<U, ExpectedT>::value && std::is_array<U>::value>::type> : public TypedMatcher<ActualT> {
-            ExpectedT _expected;
-
-            MatcherBase(ExpectedTRef expected) {
-                std::memcpy(_expected, expected, sizeof(_expected));
-            }
-        };
+        const T &_expected;
     };
 
     namespace internal {
-        struct AnyMatcherCreator{
-            template <typename ActualT>
-            struct IsTypeCompatible : std::true_type {};
+        template<typename T>
+        struct TypedAnyMatcher : public TypedMatcherCreator<T> {
 
-            template<typename ActualT>
-            TypedMatcher<ActualT> *createMatcher() const {
-                struct Matcher : public TypedMatcher<ActualT> {
-                    bool matches(const ActualT &) const override {
-                        return true;
-                    }
+            virtual ~TypedAnyMatcher() = default;
 
-                    std::string format() const override {
-                        return "Any";
-                    }
-                };
+            TypedAnyMatcher() {
+            }
 
+            struct Matcher : public TypedMatcher<T> {
+                virtual bool matches(const T &) const override {
+                    return true;
+                }
+
+                virtual std::string format() const override {
+                    return "Any";
+                }
+            };
+
+            virtual TypedMatcher<T> *createMatcher() const override {
                 return new Matcher();
             }
+
         };
 
-        template<typename ExpectedTRef>
-        struct EqMatcherCreator : public ComparisonMatcherCreatorBase<ExpectedTRef> {
-            using ExpectedT = typename ComparisonMatcherCreatorBase<ExpectedTRef>::ExpectedT;
+        template<typename T>
+        struct EqMatcherCreator : public ComparisonMatcherCreator<T> {
 
-            template <typename ActualT, typename = void>
-            struct IsTypeCompatible : std::false_type {};
+            virtual ~EqMatcherCreator() = default;
 
-            template <typename ActualT>
-            struct IsTypeCompatible<ActualT, fk_void_t<decltype(std::declval<ActualT>() == std::declval<ExpectedT>())>> : std::true_type {};
-
-            using ComparisonMatcherCreatorBase<ExpectedTRef>::ComparisonMatcherCreatorBase;
-
-            template<typename ActualT>
-            TypedMatcher<ActualT> *createMatcher() const {
-                struct Matcher : public ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT> {
-                    using ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT>::MatcherBase;
-
-                    virtual std::string format() const override {
-                        return TypeFormatter<ExpectedT>::format(this->_expected);
-                    }
-
-                    virtual bool matches(const ActualT &actual) const override {
-                        return actual == this->_expected;
-                    }
-                };
-
-                return new Matcher(std::forward<ExpectedTRef>(this->_expectedRef));
+            EqMatcherCreator(const T &expected)
+                    : ComparisonMatcherCreator<T>(expected) {
             }
-        };
 
-        template<typename ExpectedTRef>
-        struct GtMatcherCreator : public ComparisonMatcherCreatorBase<ExpectedTRef> {
-            using ExpectedT = typename ComparisonMatcherCreatorBase<ExpectedTRef>::ExpectedT;
+            struct Matcher : public ComparisonMatcherCreator<T>::Matcher {
+                Matcher(const T &expected)
+                        : ComparisonMatcherCreator<T>::Matcher(expected) {
+                }
 
-            template <typename ActualT, typename = void>
-            struct IsTypeCompatible : std::false_type {};
+                virtual std::string format() const override {
+                    return TypeFormatter<T>::format(this->_expected);
+                }
 
-            template <typename ActualT>
-            struct IsTypeCompatible<ActualT, fk_void_t<decltype(std::declval<ActualT>() > std::declval<ExpectedT>())>> : std::true_type {};
+                virtual bool matches(const T &actual) const override {
+                    return actual == this->_expected;
+                }
+            };
 
-            using ComparisonMatcherCreatorBase<ExpectedTRef>::ComparisonMatcherCreatorBase;
-
-            template<typename ActualT>
-            TypedMatcher<ActualT> *createMatcher() const {
-                struct Matcher : public ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT> {
-                    using ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT>::MatcherBase;
-
-                    virtual std::string format() const override {
-                        return std::string(">") + TypeFormatter<ExpectedT>::format(this->_expected);
-                    }
-
-                    virtual bool matches(const ActualT &actual) const override {
-                        return actual > this->_expected;
-                    }
-                };
-
-                return new Matcher(std::forward<ExpectedTRef>(this->_expectedRef));
+            virtual TypedMatcher<T> *createMatcher() const {
+                return new Matcher(this->_expected);
             }
+
         };
 
-        template<typename ExpectedTRef>
-        struct GeMatcherCreator : public ComparisonMatcherCreatorBase<ExpectedTRef> {
-            using ExpectedT = typename ComparisonMatcherCreatorBase<ExpectedTRef>::ExpectedT;
+        template<typename T>
+        struct GtMatcherCreator : public ComparisonMatcherCreator<T> {
 
-            template <typename ActualT, typename = void>
-            struct IsTypeCompatible : std::false_type {};
+            virtual ~GtMatcherCreator() = default;
 
-            template <typename ActualT>
-            struct IsTypeCompatible<ActualT, fk_void_t<decltype(std::declval<ActualT>() >= std::declval<ExpectedT>())>> : std::true_type {};
+            GtMatcherCreator(const T &expected)
+                    : ComparisonMatcherCreator<T>(expected) {
+            }
 
-            using ComparisonMatcherCreatorBase<ExpectedTRef>::ComparisonMatcherCreatorBase;
+            struct Matcher : public ComparisonMatcherCreator<T>::Matcher {
+                Matcher(const T &expected)
+                        : ComparisonMatcherCreator<T>::Matcher(expected) {
+                }
 
-            template<typename ActualT>
-            TypedMatcher<ActualT> *createMatcher() const {
-                struct Matcher : public ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT> {
-                    using ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT>::MatcherBase;
+                virtual bool matches(const T &actual) const override {
+                    return actual > this->_expected;
+                }
 
-                    virtual std::string format() const override {
-                        return std::string(">=") + TypeFormatter<ExpectedT>::format(this->_expected);
-                    }
+                virtual std::string format() const override {
+                    return std::string(">") + TypeFormatter<T>::format(this->_expected);
+                }
+            };
 
-                    virtual bool matches(const ActualT &actual) const override {
-                        return actual >= this->_expected;
-                    }
-                };
-
-                return new Matcher(std::forward<ExpectedTRef>(this->_expectedRef));
+            virtual TypedMatcher<T> *createMatcher() const override {
+                return new Matcher(this->_expected);
             }
         };
 
-        template<typename ExpectedTRef>
-        struct LtMatcherCreator : public ComparisonMatcherCreatorBase<ExpectedTRef> {
-            using ExpectedT = typename ComparisonMatcherCreatorBase<ExpectedTRef>::ExpectedT;
+        template<typename T>
+        struct GeMatcherCreator : public ComparisonMatcherCreator<T> {
 
-            template <typename ActualT, typename = void>
-            struct IsTypeCompatible : std::false_type {};
+            virtual ~GeMatcherCreator() = default;
 
-            template <typename ActualT>
-            struct IsTypeCompatible<ActualT, fk_void_t<decltype(std::declval<ActualT>() < std::declval<ExpectedT>())>> : std::true_type {};
+            GeMatcherCreator(const T &expected)
+                    : ComparisonMatcherCreator<T>(expected) {
+            }
 
-            using ComparisonMatcherCreatorBase<ExpectedTRef>::ComparisonMatcherCreatorBase;
+            struct Matcher : public ComparisonMatcherCreator<T>::Matcher {
+                Matcher(const T &expected)
+                        : ComparisonMatcherCreator<T>::Matcher(expected) {
+                }
 
-            template<typename ActualT>
-            TypedMatcher<ActualT> *createMatcher() const {
-                struct Matcher : public ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT> {
-                    using ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT>::MatcherBase;
+                virtual bool matches(const T &actual) const override {
+                    return actual >= this->_expected;
+                }
 
-                    virtual std::string format() const override {
-                        return std::string("<") + TypeFormatter<ExpectedT>::format(this->_expected);
-                    }
+                virtual std::string format() const override {
+                    return std::string(">=") + TypeFormatter<T>::format(this->_expected);
+                }
+            };
 
-                    virtual bool matches(const ActualT &actual) const override {
-                        return actual < this->_expected;
-                    }
-                };
-
-                return new Matcher(std::forward<ExpectedTRef>(this->_expectedRef));
+            virtual TypedMatcher<T> *createMatcher() const override {
+                return new Matcher(this->_expected);
             }
         };
 
-        template<typename ExpectedTRef>
-        struct LeMatcherCreator : public ComparisonMatcherCreatorBase<ExpectedTRef> {
-            using ExpectedT = typename ComparisonMatcherCreatorBase<ExpectedTRef>::ExpectedT;
+        template<typename T>
+        struct LtMatcherCreator : public ComparisonMatcherCreator<T> {
 
-            template <typename ActualT, typename = void>
-            struct IsTypeCompatible : std::false_type {};
+            virtual ~LtMatcherCreator() = default;
 
-            template <typename ActualT>
-            struct IsTypeCompatible<ActualT, fk_void_t<decltype(std::declval<ActualT>() <= std::declval<ExpectedT>())>> : std::true_type {};
-
-            using ComparisonMatcherCreatorBase<ExpectedTRef>::ComparisonMatcherCreatorBase;
-
-            template<typename ActualT>
-            TypedMatcher<ActualT> *createMatcher() const {
-                struct Matcher : public ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT> {
-                    using ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT>::MatcherBase;
-
-                    virtual std::string format() const override {
-                        return std::string("<=") + TypeFormatter<ExpectedT>::format(this->_expected);
-                    }
-
-                    virtual bool matches(const ActualT &actual) const override {
-                        return actual <= this->_expected;
-                    }
-                };
-
-                return new Matcher(std::forward<ExpectedTRef>(this->_expectedRef));
+            LtMatcherCreator(const T &expected)
+                    : ComparisonMatcherCreator<T>(expected) {
             }
+
+            struct Matcher : public ComparisonMatcherCreator<T>::Matcher {
+                Matcher(const T &expected)
+                        : ComparisonMatcherCreator<T>::Matcher(expected) {
+                }
+
+                virtual bool matches(const T &actual) const override {
+                    return actual < this->_expected;
+                }
+
+                virtual std::string format() const override {
+                    return std::string("<") + TypeFormatter<T>::format(this->_expected);
+                }
+            };
+
+            virtual TypedMatcher<T> *createMatcher() const override {
+                return new Matcher(this->_expected);
+            }
+
         };
 
-        template<typename ExpectedTRef>
-        struct NeMatcherCreator : public ComparisonMatcherCreatorBase<ExpectedTRef> {
-            using ExpectedT = typename ComparisonMatcherCreatorBase<ExpectedTRef>::ExpectedT;
+        template<typename T>
+        struct LeMatcherCreator : public ComparisonMatcherCreator<T> {
 
-            template <typename ActualT, typename = void>
-            struct IsTypeCompatible : std::false_type {};
+            virtual ~LeMatcherCreator() = default;
 
-            template <typename ActualT>
-            struct IsTypeCompatible<ActualT, fk_void_t<decltype(std::declval<ActualT>() != std::declval<ExpectedT>())>> : std::true_type {};
-
-            using ComparisonMatcherCreatorBase<ExpectedTRef>::ComparisonMatcherCreatorBase;
-
-            template<typename ActualT>
-            TypedMatcher<ActualT> *createMatcher() const {
-                struct Matcher : public ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT> {
-                    using ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT>::MatcherBase;
-
-                    virtual std::string format() const override {
-                        return std::string("!=") + TypeFormatter<ExpectedT>::format(this->_expected);
-                    }
-
-                    virtual bool matches(const ActualT &actual) const override {
-                        return actual != this->_expected;
-                    }
-                };
-
-                return new Matcher(std::forward<ExpectedTRef>(this->_expectedRef));
+            LeMatcherCreator(const T &expected)
+                    : ComparisonMatcherCreator<T>(expected) {
             }
+
+            struct Matcher : public ComparisonMatcherCreator<T>::Matcher {
+                Matcher(const T &expected)
+                        : ComparisonMatcherCreator<T>::Matcher(expected) {
+                }
+
+                virtual bool matches(const T &actual) const override {
+                    return actual <= this->_expected;
+                }
+
+                virtual std::string format() const override {
+                    return std::string("<=") + TypeFormatter<T>::format(this->_expected);
+                }
+            };
+
+            virtual TypedMatcher<T> *createMatcher() const override {
+                return new Matcher(this->_expected);
+            }
+
         };
 
-        template <typename ExpectedTRef>
-        struct StrEqMatcherCreator : public ComparisonMatcherCreatorBase<ExpectedTRef> {
-            using ExpectedT = typename ComparisonMatcherCreatorBase<ExpectedTRef>::ExpectedT;
+        template<typename T>
+        struct NeMatcherCreator : public ComparisonMatcherCreator<T> {
 
-            template <typename ActualT, typename = void>
-            struct IsTypeCompatible : std::false_type {};
+            virtual ~NeMatcherCreator() = default;
 
-            template <typename ActualT>
-            struct IsTypeCompatible<ActualT, fk_void_t<decltype(strcmp(std::declval<ActualT>(), std::declval<const char*>()))>> : std::true_type {};
-
-            using ComparisonMatcherCreatorBase<ExpectedTRef>::ComparisonMatcherCreatorBase;
-
-            template<typename ActualT>
-            TypedMatcher<ActualT> *createMatcher() const {
-                struct Matcher : public ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT> {
-                    using ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT>::MatcherBase;
-
-                    virtual std::string format() const override {
-                        return TypeFormatter<ExpectedT>::format(this->_expected);
-                    }
-
-                    virtual bool matches(const ActualT &actual) const override {
-                        return std::strcmp(actual, this->_expected.c_str()) == 0;
-                    }
-                };
-
-                return new Matcher(std::forward<ExpectedTRef>(this->_expectedRef));
-            }
-        };
-
-        template <typename ExpectedTRef>
-        struct StrGtMatcherCreator : public ComparisonMatcherCreatorBase<ExpectedTRef> {
-            using ExpectedT = typename ComparisonMatcherCreatorBase<ExpectedTRef>::ExpectedT;
-
-            template <typename ActualT, typename = void>
-            struct IsTypeCompatible : std::false_type {};
-
-            template <typename ActualT>
-            struct IsTypeCompatible<ActualT, fk_void_t<decltype(strcmp(std::declval<ActualT>(), std::declval<const char*>()))>> : std::true_type {};
-
-            using ComparisonMatcherCreatorBase<ExpectedTRef>::ComparisonMatcherCreatorBase;
-
-            template<typename ActualT>
-            TypedMatcher<ActualT> *createMatcher() const {
-                struct Matcher : public ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT> {
-                    using ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT>::MatcherBase;
-
-                    virtual std::string format() const override {
-                        return std::string(">") + TypeFormatter<ExpectedT>::format(this->_expected);
-                    }
-
-                    virtual bool matches(const ActualT &actual) const override {
-                        return std::strcmp(actual, this->_expected.c_str()) > 0;
-                    }
-                };
-
-                return new Matcher(std::forward<ExpectedTRef>(this->_expectedRef));
-            }
-        };
-
-        template <typename ExpectedTRef>
-        struct StrGeMatcherCreator : public ComparisonMatcherCreatorBase<ExpectedTRef> {
-            using ExpectedT = typename ComparisonMatcherCreatorBase<ExpectedTRef>::ExpectedT;
-
-            template <typename ActualT, typename = void>
-            struct IsTypeCompatible : std::false_type {};
-
-            template <typename ActualT>
-            struct IsTypeCompatible<ActualT, fk_void_t<decltype(strcmp(std::declval<ActualT>(), std::declval<const char*>()))>> : std::true_type {};
-
-            using ComparisonMatcherCreatorBase<ExpectedTRef>::ComparisonMatcherCreatorBase;
-
-            template<typename ActualT>
-            TypedMatcher<ActualT> *createMatcher() const {
-                struct Matcher : public ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT> {
-                    using ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT>::MatcherBase;
-
-                    virtual std::string format() const override {
-                        return std::string(">=") + TypeFormatter<ExpectedT>::format(this->_expected);
-                    }
-
-                    virtual bool matches(const ActualT &actual) const override {
-                        return std::strcmp(actual, this->_expected.c_str()) >= 0;
-                    }
-                };
-
-                return new Matcher(std::forward<ExpectedTRef>(this->_expectedRef));
-            }
-        };
-
-        template <typename ExpectedTRef>
-        struct StrLtMatcherCreator : public ComparisonMatcherCreatorBase<ExpectedTRef> {
-            using ExpectedT = typename ComparisonMatcherCreatorBase<ExpectedTRef>::ExpectedT;
-
-            template <typename ActualT, typename = void>
-            struct IsTypeCompatible : std::false_type {};
-
-            template <typename ActualT>
-            struct IsTypeCompatible<ActualT, fk_void_t<decltype(strcmp(std::declval<ActualT>(), std::declval<const char*>()))>> : std::true_type {};
-
-            using ComparisonMatcherCreatorBase<ExpectedTRef>::ComparisonMatcherCreatorBase;
-
-            template<typename ActualT>
-            TypedMatcher<ActualT> *createMatcher() const {
-                struct Matcher : public ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT> {
-                    using ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT>::MatcherBase;
-
-                    virtual std::string format() const override {
-                        return std::string("<") + TypeFormatter<ExpectedT>::format(this->_expected);
-                    }
-
-                    virtual bool matches(const ActualT &actual) const override {
-                        return std::strcmp(actual, this->_expected.c_str()) < 0;
-                    }
-                };
-
-                return new Matcher(std::forward<ExpectedTRef>(this->_expectedRef));
-            }
-        };
-
-        template <typename ExpectedTRef>
-        struct StrLeMatcherCreator : public ComparisonMatcherCreatorBase<ExpectedTRef> {
-            using ExpectedT = typename ComparisonMatcherCreatorBase<ExpectedTRef>::ExpectedT;
-
-            template <typename ActualT, typename = void>
-            struct IsTypeCompatible : std::false_type {};
-
-            template <typename ActualT>
-            struct IsTypeCompatible<ActualT, fk_void_t<decltype(strcmp(std::declval<ActualT>(), std::declval<const char*>()))>> : std::true_type {};
-
-            using ComparisonMatcherCreatorBase<ExpectedTRef>::ComparisonMatcherCreatorBase;
-
-            template<typename ActualT>
-            TypedMatcher<ActualT> *createMatcher() const {
-                struct Matcher : public ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT> {
-                    using ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT>::MatcherBase;
-
-                    virtual std::string format() const override {
-                        return std::string("<=") + TypeFormatter<ExpectedT>::format(this->_expected);
-                    }
-
-                    virtual bool matches(const ActualT &actual) const override {
-                        return std::strcmp(actual, this->_expected.c_str()) <= 0;
-                    }
-                };
-
-                return new Matcher(std::forward<ExpectedTRef>(this->_expectedRef));
-            }
-        };
-
-        template <typename ExpectedTRef>
-        struct StrNeMatcherCreator : public ComparisonMatcherCreatorBase<ExpectedTRef> {
-            using ExpectedT = typename ComparisonMatcherCreatorBase<ExpectedTRef>::ExpectedT;
-
-            template <typename ActualT, typename = void>
-            struct IsTypeCompatible : std::false_type {};
-
-            template <typename ActualT>
-            struct IsTypeCompatible<ActualT, fk_void_t<decltype(strcmp(std::declval<ActualT>(), std::declval<const char*>()))>> : std::true_type {};
-
-            using ComparisonMatcherCreatorBase<ExpectedTRef>::ComparisonMatcherCreatorBase;
-
-            template<typename ActualT>
-            TypedMatcher<ActualT> *createMatcher() const {
-                struct Matcher : public ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT> {
-                    using ComparisonMatcherCreatorBase<ExpectedTRef>::template MatcherBase<ActualT>::MatcherBase;
-
-                    virtual std::string format() const override {
-                        return std::string("!=") + TypeFormatter<ExpectedT>::format(this->_expected);
-                    }
-
-                    virtual bool matches(const ActualT &actual) const override {
-                        return std::strcmp(actual, this->_expected.c_str()) != 0;
-                    }
-                };
-
-                return new Matcher(std::forward<ExpectedTRef>(this->_expectedRef));
-            }
-        };
-
-        template<typename ExpectedTRef, typename ExpectedMarginTRef>
-        struct ApproxEqCreator {
-            using ExpectedT = typename naked_type<ExpectedTRef>::type;
-            using ExpectedMarginT = typename naked_type<ExpectedMarginTRef>::type;
-
-            template <typename ActualT, typename = void>
-            struct IsTypeCompatible : std::false_type {};
-
-            template <typename ActualT>
-            struct IsTypeCompatible<ActualT, fk_void_t<decltype(std::abs(std::declval<ActualT>() - std::declval<ExpectedT>()) <= std::declval<ExpectedMarginT>())>> : std::true_type {};
-
-            ExpectedTRef _expectedRef;
-            ExpectedMarginTRef _expectedMarginRef;
-
-            template <typename T, typename U>
-            ApproxEqCreator(T &&expectedRef, U &&expectedMarginRef)
-                    : _expectedRef(std::forward<T>(expectedRef))
-                    , _expectedMarginRef(std::forward<U>(expectedMarginRef)) {
+            NeMatcherCreator(const T &expected)
+                    : ComparisonMatcherCreator<T>(expected) {
             }
 
-            template<typename ActualT>
-            TypedMatcher<ActualT> *createMatcher() const {
-                struct Matcher : public TypedMatcher<ActualT> {
-                    const ExpectedT _expected;
-                    const ExpectedMarginT _expectedMargin;
+            struct Matcher : public ComparisonMatcherCreator<T>::Matcher {
+                Matcher(const T &expected)
+                        : ComparisonMatcherCreator<T>::Matcher(expected) {
+                }
 
-                    Matcher(ExpectedTRef expected, ExpectedMarginTRef expectedMargin)
-                            : _expected{std::forward<ExpectedTRef>(expected)}
-                            , _expectedMargin{std::forward<ExpectedMarginTRef>(expectedMargin)} {
-                    }
+                virtual bool matches(const T &actual) const override {
+                    return actual != this->_expected;
+                }
 
-                    virtual std::string format() const override {
-                        return TypeFormatter<ExpectedT>::format(this->_expected) + std::string("+/-") + TypeFormatter<ExpectedMarginT>::format(this->_expectedMargin);
-                    }
+                virtual std::string format() const override {
+                    return std::string("!=") + TypeFormatter<T>::format(this->_expected);
+                }
 
-                    virtual bool matches(const ActualT &actual) const override {
-                        return std::abs(actual - this->_expected) <= this->_expectedMargin;
-                    }
-                };
+            };
 
-                return new Matcher(std::forward<ExpectedTRef>(this->_expectedRef), std::forward<ExpectedMarginTRef>(this->_expectedMarginRef));
+            virtual TypedMatcher<T> *createMatcher() const override {
+                return new Matcher(this->_expected);
             }
+
         };
     }
 
     struct AnyMatcher {
     } static _;
 
-    template <typename T>
-    internal::AnyMatcherCreator Any() {
-        static_assert(sizeof(T) >= 0, "To maintain backward compatibility, this function takes an useless template argument.");
-        internal::AnyMatcherCreator mc;
-        return mc;
-    }
-
-    inline internal::AnyMatcherCreator Any() {
-        internal::AnyMatcherCreator mc;
-        return mc;
+    template<typename T>
+    internal::TypedAnyMatcher<T> Any() {
+        internal::TypedAnyMatcher<T> rv;
+        return rv;
     }
 
     template<typename T>
-    internal::EqMatcherCreator<T&&> Eq(T &&arg) {
-        internal::EqMatcherCreator<T&&> mc(std::forward<T>(arg));
-        return mc;
+    internal::EqMatcherCreator<T> Eq(const T &arg) {
+        internal::EqMatcherCreator<T> rv(arg);
+        return rv;
     }
 
     template<typename T>
-    internal::GtMatcherCreator<T&&> Gt(T &&arg) {
-        internal::GtMatcherCreator<T&&> mc(std::forward<T>(arg));
-        return mc;
+    internal::GtMatcherCreator<T> Gt(const T &arg) {
+        internal::GtMatcherCreator<T> rv(arg);
+        return rv;
     }
 
     template<typename T>
-    internal::GeMatcherCreator<T&&> Ge(T &&arg) {
-        internal::GeMatcherCreator<T&&> mc(std::forward<T>(arg));
-        return mc;
+    internal::GeMatcherCreator<T> Ge(const T &arg) {
+        internal::GeMatcherCreator<T> rv(arg);
+        return rv;
     }
 
     template<typename T>
-    internal::LtMatcherCreator<T&&> Lt(T &&arg) {
-        internal::LtMatcherCreator<T&&> mc(std::forward<T>(arg));
-        return mc;
+    internal::LtMatcherCreator<T> Lt(const T &arg) {
+        internal::LtMatcherCreator<T> rv(arg);
+        return rv;
     }
 
     template<typename T>
-    internal::LeMatcherCreator<T&&> Le(T &&arg) {
-        internal::LeMatcherCreator<T&&> mc(std::forward<T>(arg));
-        return mc;
+    internal::LeMatcherCreator<T> Le(const T &arg) {
+        internal::LeMatcherCreator<T> rv(arg);
+        return rv;
     }
 
     template<typename T>
-    internal::NeMatcherCreator<T&&> Ne(T &&arg) {
-        internal::NeMatcherCreator<T&&> mc(std::forward<T>(arg));
-        return mc;
-    }
-
-    inline internal::StrEqMatcherCreator<std::string&&> StrEq(std::string&& arg) {
-        internal::StrEqMatcherCreator<std::string&&> mc(std::move(arg));
-        return mc;
-    }
-
-    inline internal::StrEqMatcherCreator<const std::string&> StrEq(const std::string& arg) {
-        internal::StrEqMatcherCreator<const std::string&> mc(arg);
-        return mc;
-    }
-
-    inline internal::StrGtMatcherCreator<std::string&&> StrGt(std::string&& arg) {
-        internal::StrGtMatcherCreator<std::string&&> mc(std::move(arg));
-        return mc;
-    }
-
-    inline internal::StrGtMatcherCreator<const std::string&> StrGt(const std::string& arg) {
-        internal::StrGtMatcherCreator<const std::string&> mc(arg);
-        return mc;
-    }
-
-    inline internal::StrGeMatcherCreator<std::string&&> StrGe(std::string&& arg) {
-        internal::StrGeMatcherCreator<std::string&&> mc(std::move(arg));
-        return mc;
-    }
-
-    inline internal::StrGeMatcherCreator<const std::string&> StrGe(const std::string& arg) {
-        internal::StrGeMatcherCreator<const std::string&> mc(arg);
-        return mc;
-    }
-
-    inline internal::StrLtMatcherCreator<std::string&&> StrLt(std::string&& arg) {
-        internal::StrLtMatcherCreator<std::string&&> mc(std::move(arg));
-        return mc;
-    }
-
-    inline internal::StrLtMatcherCreator<const std::string&> StrLt(const std::string& arg) {
-        internal::StrLtMatcherCreator<const std::string&> mc(arg);
-        return mc;
-    }
-
-    inline internal::StrLeMatcherCreator<std::string&&> StrLe(std::string&& arg) {
-        internal::StrLeMatcherCreator<std::string&&> mc(std::move(arg));
-        return mc;
-    }
-
-    inline internal::StrLeMatcherCreator<const std::string&> StrLe(const std::string& arg) {
-        internal::StrLeMatcherCreator<const std::string&> mc(arg);
-        return mc;
-    }
-
-    inline internal::StrNeMatcherCreator<std::string&&> StrNe(std::string&& arg) {
-        internal::StrNeMatcherCreator<std::string&&> mc(std::move(arg));
-        return mc;
-    }
-
-    inline internal::StrNeMatcherCreator<const std::string&> StrNe(const std::string& arg) {
-        internal::StrNeMatcherCreator<const std::string&> mc(arg);
-        return mc;
-    }
-
-    template<typename T, typename U,
-        typename std::enable_if<std::is_arithmetic<typename naked_type<T>::type>::value, int>::type = 0,
-        typename std::enable_if<std::is_arithmetic<typename naked_type<U>::type>::value, int>::type = 0>
-    internal::ApproxEqCreator<T&&, U&&> ApproxEq(T &&expected, U &&margin) {
-        internal::ApproxEqCreator<T&&, U&&> mc(std::forward<T>(expected), std::forward<U>(margin));
-        return mc;
+    internal::NeMatcherCreator<T> Ne(const T &arg) {
+        internal::NeMatcherCreator<T> rv(arg);
+        return rv;
     }
 
 }
@@ -7199,7 +6777,7 @@ namespace fakeit {
     struct UserDefinedInvocationMatcher : ActualInvocation<arglist...>::Matcher {
         virtual ~UserDefinedInvocationMatcher() = default;
 
-        UserDefinedInvocationMatcher(const std::function<bool(arglist &...)>& match)
+        UserDefinedInvocationMatcher(std::function<bool(arglist &...)> match)
                 : matcher{match} {
         }
 
@@ -7319,7 +6897,7 @@ namespace fakeit {
         RecordedMethodBody(FakeitContext &fakeit, std::string name) :
                 _fakeit(fakeit), _method{MethodInfo::nextMethodOrdinal(), name} { }
 
-        virtual ~RecordedMethodBody() FAKEIT_NO_THROWS {
+        virtual ~RecordedMethodBody() NO_THROWS {
         }
 
         MethodInfo &getMethod() {
@@ -7442,7 +7020,7 @@ namespace fakeit {
     template<int q>
     struct Times : public Quantity {
 
-        Times() : Quantity(q) { }
+        Times<q>() : Quantity(q) { }
 
         template<typename R>
         static Quantifier<R> of(const R &value) {
@@ -7573,28 +7151,10 @@ namespace fakeit {
 
 namespace fakeit {
 
-    namespace helper
-    {
-        template <typename T, int N>
-        struct ArgValue;
-
-        template <int max_index, int tuple_index>
-        struct ArgValidator;
-
-        template<int arg_index, typename current_arg, typename ...T, int ...N, typename ... arglist>
-        static void
-        Assign(std::tuple<ArgValue<T, N>...> arg_vals, current_arg &&p, arglist &&... args);
-
-        template<int N>
-        struct ParamWalker;
-
-    }
-
-
     template<typename R, typename ... arglist>
     struct MethodStubbingProgress {
 
-        virtual ~MethodStubbingProgress() FAKEIT_THROWS {
+        virtual ~MethodStubbingProgress() THROWS {
         }
 
         template<typename U = R>
@@ -7607,15 +7167,6 @@ namespace fakeit {
         typename std::enable_if<std::is_reference<U>::value, MethodStubbingProgress<R, arglist...> &>::type
         Return(const R &r) {
             return Do([&r](const typename fakeit::test_arg<arglist>::type...) -> R { return r; });
-        }
-
-        template<typename U = R>
-        typename std::enable_if<!std::is_copy_constructible<U>::value, MethodStubbingProgress<R, arglist...>&>::type
-            Return(R&& r) {
-            auto store = std::make_shared<R>(std::move(r));
-            return Do([store](const typename fakeit::test_arg<arglist>::type...) mutable -> R {
-                return std::move(*store);
-            });
         }
 
         MethodStubbingProgress<R, arglist...> &
@@ -7679,19 +7230,6 @@ namespace fakeit {
             return AlwaysDo([e](const typename fakeit::test_arg<arglist>::type...) -> R { throw e; });
         }
 
-        template<typename ... valuelist>
-        MethodStubbingProgress<R, arglist...> &
-        ReturnAndSet(R &&r, valuelist &&... arg_vals) {
-            return Do(GetAssigner(std::forward<R>(r),
-                    std::forward<valuelist>(arg_vals)...));
-        }
-
-        template<typename ... valuelist>
-        void AlwaysReturnAndSet(R &&r, valuelist &&... arg_vals) {
-            AlwaysDo(GetAssigner(std::forward<R>(r),
-                std::forward<valuelist>(arg_vals)...));
-        }
-
         virtual MethodStubbingProgress<R, arglist...> &
             Do(std::function<R(const typename fakeit::test_arg<arglist>::type...)> method) {
             return DoImpl(new Repeat<R, arglist...>(method));
@@ -7720,66 +7258,13 @@ namespace fakeit {
 
     private:
         MethodStubbingProgress &operator=(const MethodStubbingProgress &other) = delete;
-
-        template<typename ... valuelist>
-#if FAKEIT_CPLUSPLUS >= 201402L
-        auto
-#else
-        std::function<R (typename fakeit::test_arg<arglist>::type...)>
-#endif
-        GetAssigner(R &&r, valuelist &&... arg_vals) {
-            class Lambda {
-            public:
-                Lambda(R &&r, valuelist &&... arg_vals)
-                    : vals_tuple{std::forward<R>(r), std::forward<valuelist>(arg_vals)...} {}
-
-                R operator()(typename fakeit::test_arg<arglist>::type... args) {
-                    helper::ParamWalker<sizeof...(valuelist)>::Assign(vals_tuple,
-                        std::forward<arglist>(args)...);
-                    return std::get<0>(vals_tuple);
-                }
-
-            private:
-                ArgumentsTuple<R, valuelist...> vals_tuple;
-            };
-
-            return Lambda(std::forward<R>(r), std::forward<valuelist>(arg_vals)...);
-        }
-
-        template<typename ...T, int ...N>
-#if FAKEIT_CPLUSPLUS >= 201402L
-        auto
-#else
-        std::function<R (typename fakeit::test_arg<arglist>::type...)>
-#endif
-        GetAssigner(R &&r, helper::ArgValue<T, N>... arg_vals) {
-            class Lambda {
-            public:
-                Lambda(R &&r, helper::ArgValue<T, N>... arg_vals)
-                    : ret{std::forward<R>(r)}
-                    , vals_tuple{std::forward<helper::ArgValue<T, N>>(arg_vals)...} {}
-
-                R operator()(typename fakeit::test_arg<arglist>::type... args) {
-                    helper::ArgValidator<sizeof...(arglist), sizeof...(T) - 1>::CheckPositions(vals_tuple);
-                    helper::Assign<1>(vals_tuple, std::forward<arglist>(args)...);
-                    return std::get<0>(ret);
-                }
-
-            private:
-                std::tuple<R> ret;
-                ArgumentsTuple<helper::ArgValue<T, N>...> vals_tuple;
-            };
-
-            return Lambda(std::forward<R>(r), std::forward<helper::ArgValue<T, N>>(arg_vals)...);
-        }
-
     };
 
 
     template<typename ... arglist>
     struct MethodStubbingProgress<void, arglist...> {
 
-        virtual ~MethodStubbingProgress() FAKEIT_THROWS {
+        virtual ~MethodStubbingProgress() THROWS {
         }
 
         MethodStubbingProgress<void, arglist...> &Return() {
@@ -7830,18 +7315,7 @@ namespace fakeit {
             return AlwaysDo([e](const typename fakeit::test_arg<arglist>::type...) -> void { throw e; });
         }
 
-        template<typename ... valuelist>
-        MethodStubbingProgress<void, arglist...> &
-        ReturnAndSet(valuelist &&... arg_vals) {
-            return Do(GetAssigner(std::forward<valuelist>(arg_vals)...));
-        }
-
-        template<typename ... valuelist>
-        void AlwaysReturnAndSet(valuelist &&... arg_vals) {
-            AlwaysDo(GetAssigner(std::forward<valuelist>(arg_vals)...));
-        }
-
-        template<typename F>
+           template<typename F>
         MethodStubbingProgress<void, arglist...> &
         Do(const Quantifier<F> &q) {
             return DoImpl(new Repeat<void, arglist...>(q.value, q.quantity));
@@ -7864,197 +7338,33 @@ namespace fakeit {
 
     private:
         MethodStubbingProgress &operator=(const MethodStubbingProgress &other) = delete;
-
-        template<typename ... valuelist>
-#if FAKEIT_CPLUSPLUS >= 201402L
-        auto
-#else
-        std::function<void (typename fakeit::test_arg<arglist>::type...)>
-#endif
-        GetAssigner(valuelist &&... arg_vals) {
-            class Lambda {
-            public:
-                Lambda(valuelist &&... arg_vals)
-                    : vals_tuple{std::forward<valuelist>(arg_vals)...} {}
-
-                void operator()(typename fakeit::test_arg<arglist>::type... args) {
-                    helper::ParamWalker<sizeof...(valuelist)>::Assign(vals_tuple,
-                        std::forward<arglist>(args)...);
-                }
-
-            private:
-                ArgumentsTuple<valuelist...> vals_tuple;
-            };
-
-            return Lambda(std::forward<valuelist>(arg_vals)...);
-        }
-
-        template<typename ...T, int ...N>
-#if FAKEIT_CPLUSPLUS >= 201402L
-        auto
-#else
-        std::function<void (typename fakeit::test_arg<arglist>::type...)>
-#endif
-        GetAssigner(helper::ArgValue<T, N>... arg_vals) {
-            class Lambda {
-            public:
-                Lambda(helper::ArgValue<T, N>... arg_vals)
-                    : vals_tuple{std::forward<helper::ArgValue<T, N>>(arg_vals)...} {}
-
-                void operator()(typename fakeit::test_arg<arglist>::type... args) {
-                    helper::ArgValidator<sizeof...(arglist), sizeof...(T) - 1>::CheckPositions(vals_tuple);
-                    helper::Assign<1>(vals_tuple, std::forward<arglist>(args)...);
-                }
-
-            private:
-                ArgumentsTuple<helper::ArgValue<T, N>...> vals_tuple;
-            };
-
-            return Lambda(std::forward<helper::ArgValue<T, N>>(arg_vals)...);
-        }
-
     };
 
 
-    namespace helper
-    {
-        template <typename T, int N>
-        struct ArgValue
-        {
-            ArgValue(T &&v): value ( std::forward<T>(v) ) {}
-            constexpr static int pos = N;
-            T value;
-        };
-
-        template <int max_index, int tuple_index>
-        struct ArgValidator
-        {
-            template <typename ...T, int ...N>
-            static void CheckPositions(const std::tuple<ArgValue<T, N>...> arg_vals)
-            {
-#if FAKEIT_CPLUSPLUS >= 201402L && !defined(_WIN32)
-                static_assert(std::get<tuple_index>(arg_vals).pos <= max_index,
-                    "Argument index out of range");
-                ArgValidator<max_index, tuple_index - 1>::CheckPositions(arg_vals);
-#else
-                (void)arg_vals;
-#endif
-            }
-        };
-
-        template <int max_index>
-        struct ArgValidator<max_index, -1>
-        {
-            template <typename T>
-            static void CheckPositions(T) {}
-        };
-
-        template <typename current_arg>
-        typename std::enable_if<std::is_pointer<current_arg>::value,
-            typename std::remove_pointer<current_arg>::type &>::type
-        GetArg(current_arg &&t)
-        {
-            return *t;
-        }
-
-        template <typename current_arg>
-        typename std::enable_if<!std::is_pointer<current_arg>::value, current_arg>::type
-        GetArg(current_arg &&t)
-        {
-            return std::forward<current_arg>(t);
-        }
-
-        template<int N>
-        struct ParamWalker {
-            template<typename current_arg, typename ... valuelist, typename ... arglist>
-            static void
-            Assign(ArgumentsTuple<valuelist...> arg_vals, current_arg &&p, arglist&&... args) {
-                ParamWalker<N - 1>::template Assign(arg_vals, std::forward<arglist>(args)...);
-                GetArg(std::forward<current_arg>(p)) = std::get<sizeof...(valuelist) - N>(arg_vals);
-            }
-        };
-
-        template<>
-        struct ParamWalker<0> {
-            template<typename ... valuelist, typename ... arglist>
-            static void Assign(ArgumentsTuple<valuelist...>, arglist... ) {}
-        };
-
-        template<int arg_index, int check_index>
-        struct ArgLocator {
-            template<typename current_arg, typename ...T, int ...N>
-            static void AssignArg(current_arg &&p, std::tuple<ArgValue<T, N>...> arg_vals) {
-#if FAKEIT_CPLUSPLUS >= 201703L && !defined (_WIN32)
-                if constexpr (std::get<check_index>(arg_vals).pos == arg_index)
-                    GetArg(std::forward<current_arg>(p)) = std::get<check_index>(arg_vals).value;
-#else
-                if (std::get<check_index>(arg_vals).pos == arg_index)
-                    Set(std::forward<current_arg>(p), std::get<check_index>(arg_vals).value);
-#endif
-                else if (check_index > 0)
-                    ArgLocator<arg_index, check_index - 1>::AssignArg(std::forward<current_arg>(p), arg_vals);
-            }
-
-#if FAKEIT_CPLUSPLUS < 201703L || defined (_WIN32)
-        private:
-            template<typename T, typename U>
-            static
-            typename std::enable_if<std::is_assignable<decltype(GetArg(std::declval<T>())), U>::value, void>::type
-            Set(T &&p, U &&v)
-            {
-                GetArg(std::forward<T>(p)) = v;
-            }
-
-            template<typename T, typename U>
-            static
-            typename std::enable_if<!std::is_assignable<decltype(GetArg(std::declval<T>())), U>::value, void>::type
-            Set(T &&, U &&)
-            {
-                throw std::logic_error("ReturnAndSet(): Invalid value type");
-            }
-#endif
-
-        };
-
-        template<int arg_index>
-        struct ArgLocator<arg_index, -1> {
-            template<typename current_arg, typename T>
-            static void AssignArg(current_arg, T) {
-            }
-        };
-
-        template<int arg_index, typename current_arg, typename ...T, int ...N, typename ... arglist>
-        static void
-        Assign(std::tuple<ArgValue<T, N>...> arg_vals, current_arg &&p, arglist &&... args) {
-            ArgLocator<arg_index, sizeof...(N) - 1>::AssignArg(std::forward<current_arg>(p), arg_vals);
-            Assign<arg_index + 1>(arg_vals, std::forward<arglist>(args)...);
-        }
-
-        template<int arg_index,  typename ... valuelist>
-        static void Assign(std::tuple<valuelist...>) {}
-
-    }
-
-
-    namespace placeholders
-    {
-        using namespace std::placeholders;
-
-        template <typename PlaceHolder, typename ArgType,
-            typename std::enable_if<static_cast<bool>(std::is_placeholder<PlaceHolder>::value), bool>::type = true>
-        helper::ArgValue<ArgType, std::is_placeholder<PlaceHolder>::value>
-        operator<=(PlaceHolder, ArgType &&arg)
-        {
-            return { std::forward<ArgType>(arg) };
-        }
-
-    }
-
-    using placeholders::operator <=;
 }
 #include <vector>
+#include <functional>
 
+namespace fakeit {
 
+    class Finally {
+    private:
+        std::function<void()> _finallyClause;
+
+        Finally(const Finally &);
+
+        Finally &operator=(const Finally &);
+
+    public:
+        explicit Finally(std::function<void()> f) :
+                _finallyClause(f) {
+        }
+
+        ~Finally() {
+            _finallyClause();
+        }
+    };
+}
 
 namespace fakeit {
 
@@ -8077,10 +7387,7 @@ namespace fakeit {
             Action<R, arglist...> &action = dynamic_cast<Action<R, arglist...> &>(destructable);
             std::function<void()> finallyClause = [&]() -> void {
                 if (action.isDone())
-                {
                     _recordedActions.erase(_recordedActions.begin());
-                    _usedActions.push_back(destructablePtr);
-                }
             };
             Finally onExit(finallyClause);
             return action.invoke(args);
@@ -8112,20 +7419,18 @@ namespace fakeit {
 
         void clear() {
             _recordedActions.clear();
-            _usedActions.clear();
             auto actionPtr = std::shared_ptr<Destructible> {new NoMoreRecordedAction()};
             _recordedActions.push_back(actionPtr);
         }
 
         std::vector<std::shared_ptr<Destructible>> _recordedActions;
-        std::vector<std::shared_ptr<Destructible>> _usedActions;
     };
 
 }
 
 namespace fakeit {
 
-    template<typename C, typename DataType>
+    template<typename C, typename DATA_TYPE>
     class DataMemberStubbingRoot {
     private:
 
@@ -8134,7 +7439,7 @@ namespace fakeit {
 
         DataMemberStubbingRoot() = default;
 
-        void operator=(const DataType&) {
+        void operator=(const DATA_TYPE&) {
         }
     };
 
@@ -8163,8 +7468,7 @@ namespace fakeit {
     struct SpyingContext : Xaction {
         virtual void appendAction(Action<R, arglist...> *action) = 0;
 
-        virtual std::function<R(arglist&...)> getOriginalMethodCopyArgs() = 0;
-        virtual std::function<R(arglist&...)> getOriginalMethodForwardArgs() = 0;
+        virtual std::function<R(arglist&...)> getOriginalMethod() = 0;
     };
 }
 namespace fakeit {
@@ -8199,11 +7503,8 @@ namespace fakeit {
         template<std::size_t N>
         using NakedArgType = typename naked_type<ArgType<index>>::type;
 
-        template <typename MatcherCreatorT, typename = void>
-        struct IsMatcherCreatorTypeCompatible : std::false_type {};
-
-        template <typename MatcherCreatorT>
-        struct IsMatcherCreatorTypeCompatible<MatcherCreatorT, typename std::enable_if<MatcherCreatorT::template IsTypeCompatible<NakedArgType<index>>::value, void>::type> : std::true_type {};
+        template<std::size_t N>
+        using ArgMatcherCreatorType = decltype(std::declval<TypedMatcherCreator<NakedArgType<N>>>());
 
         MatchersCollector(std::vector<Destructible *> &matchers)
                 : _matchers(matchers) {
@@ -8214,36 +7515,56 @@ namespace fakeit {
 
         template<typename Head>
         typename std::enable_if<
-                !std::is_same<AnyMatcher, typename naked_type<Head>::type>::value &&
-                !IsMatcherCreatorTypeCompatible<typename naked_type<Head>::type>::value &&
-                std::is_constructible<NakedArgType<index>, Head&&>::value, void>
-        ::type CollectMatchers(Head &&value) {
+                std::is_constructible<NakedArgType<index>, Head>::value, void>
+        ::type CollectMatchers(const Head &value) {
 
-            TypedMatcher<NakedArgType<index>> *d = Eq(std::forward<Head>(value)).template createMatcher<NakedArgType<index>>();
-            _matchers.push_back(d);
-        }
-
-        template<typename Head>
-        typename std::enable_if<
-                IsMatcherCreatorTypeCompatible<typename naked_type<Head>::type>::value, void>
-        ::type CollectMatchers(Head &&creator) {
-            TypedMatcher<NakedArgType<index>> *d = creator.template createMatcher<NakedArgType<index>>();
-            _matchers.push_back(d);
-        }
-
-        template<typename Head>
-        typename std::enable_if<
-                std::is_same<AnyMatcher, typename naked_type<Head>::type>::value, void>
-        ::type CollectMatchers(Head &&) {
-            TypedMatcher<NakedArgType<index>> *d = Any().template createMatcher<NakedArgType<index>>();
+            TypedMatcher<NakedArgType<index>> *d = Eq<NakedArgType<index>>(value).createMatcher();
             _matchers.push_back(d);
         }
 
         template<typename Head, typename ...Tail>
-        void CollectMatchers(Head &&head, Tail &&... tail) {
-            CollectMatchers(std::forward<Head>(head));
+        typename std::enable_if<
+                std::is_constructible<NakedArgType<index>, Head>::value
+                , void>
+        ::type CollectMatchers(const Head &head, const Tail &... tail) {
+            CollectMatchers(head);
             MatchersCollector<index + 1, arglist...> c(_matchers);
-            c.CollectMatchers(std::forward<Tail>(tail)...);
+            c.CollectMatchers(tail...);
+        }
+
+        template<typename Head>
+        typename std::enable_if<
+                std::is_base_of<TypedMatcherCreator<NakedArgType<index>>, Head>::value, void>
+        ::type CollectMatchers(const Head &creator) {
+            TypedMatcher<NakedArgType<index>> *d = creator.createMatcher();
+            _matchers.push_back(d);
+        }
+
+        template<typename Head, typename ...Tail>
+
+        typename std::enable_if<
+                std::is_base_of<TypedMatcherCreator<NakedArgType<index>>, Head>::value, void>
+        ::type CollectMatchers(const Head &head, const Tail &... tail) {
+            CollectMatchers(head);
+            MatchersCollector<index + 1, arglist...> c(_matchers);
+            c.CollectMatchers(tail...);
+        }
+
+        template<typename Head>
+        typename std::enable_if<
+                std::is_same<AnyMatcher, Head>::value, void>
+        ::type CollectMatchers(const Head &) {
+            TypedMatcher<NakedArgType<index>> *d = Any<NakedArgType<index>>().createMatcher();
+            _matchers.push_back(d);
+        }
+
+        template<typename Head, typename ...Tail>
+        typename std::enable_if<
+                std::is_same<AnyMatcher, Head>::value, void>
+        ::type CollectMatchers(const Head &head, const Tail &... tail) {
+            CollectMatchers(head);
+            MatchersCollector<index + 1, arglist...> c(_matchers);
+            c.CollectMatchers(tail...);
         }
 
     };
@@ -8264,8 +7585,7 @@ namespace fakeit {
         struct Context : Destructible {
 
 
-            virtual typename std::function<R(arglist&...)> getOriginalMethodCopyArgs() = 0;
-            virtual typename std::function<R(arglist&...)> getOriginalMethodForwardArgs() = 0;
+            virtual typename std::function<R(arglist&...)> getOriginalMethod() = 0;
 
             virtual std::string getMethodName() = 0;
 
@@ -8364,12 +7684,8 @@ namespace fakeit {
                 into.push_back(&getStubbingContext().getInvolvedMock());
             }
 
-            typename std::function<R(arglist &...)> getOriginalMethodCopyArgs() {
-                return getStubbingContext().getOriginalMethodCopyArgs();
-            }
-
-            typename std::function<R(arglist &...)> getOriginalMethodForwardArgs() {
-                return getStubbingContext().getOriginalMethodForwardArgs();
+            typename std::function<R(arglist &...)> getOriginalMethod() {
+                return getStubbingContext().getOriginalMethod();
             }
 
             void setInvocationMatcher(typename ActualInvocation<arglist...>::Matcher *matcher) {
@@ -8384,7 +7700,7 @@ namespace fakeit {
                 : _impl{new Implementation(stubbingContext)} {
         }
 
-        MethodMockingContext(const MethodMockingContext &) = default;
+        MethodMockingContext(MethodMockingContext &) = default;
 
 
 
@@ -8392,7 +7708,7 @@ namespace fakeit {
                 : _impl(std::move(other._impl)) {
         }
 
-        virtual ~MethodMockingContext() FAKEIT_NO_THROWS { }
+        virtual ~MethodMockingContext() NO_THROWS { }
 
         std::string format() const override {
             return _impl->format();
@@ -8431,13 +7747,13 @@ namespace fakeit {
             _impl->setMethodDetails(mockName, methodName);
         }
 
-        void setMatchingCriteria(const std::function<bool(arglist &...)>& predicate) {
+        void setMatchingCriteria(std::function<bool(arglist &...)> predicate) {
             typename ActualInvocation<arglist...>::Matcher *matcher{
                     new UserDefinedInvocationMatcher<arglist...>(predicate)};
             _impl->setInvocationMatcher(matcher);
         }
 
-        void setMatchingCriteria(std::vector<Destructible *> &matchers) {
+        void setMatchingCriteria(const std::vector<Destructible *> &matchers) {
             typename ActualInvocation<arglist...>::Matcher *matcher{
                     new ArgumentsMatcherInvocationMatcher<arglist...>(matchers)};
             _impl->setInvocationMatcher(matcher);
@@ -8452,26 +7768,21 @@ namespace fakeit {
             _impl->setMethodBodyByAssignment(method);
         }
 
-        template<class ...matcherCreators>
-        typename std::enable_if<
-                sizeof...(matcherCreators) == sizeof...(arglist), void>
-        ::type setMatchingCriteria(matcherCreators &&... matcherCreator) {
+        template<class ...matcherCreators, class = typename std::enable_if<
+                sizeof...(matcherCreators) == sizeof...(arglist)>::type>
+        void setMatchingCriteria(const matcherCreators &... matcherCreator) {
             std::vector<Destructible *> matchers;
 
             MatchersCollector<0, arglist...> c(matchers);
-            c.CollectMatchers(std::forward<matcherCreators>(matcherCreator)...);
+            c.CollectMatchers(matcherCreator...);
 
             MethodMockingContext<R, arglist...>::setMatchingCriteria(matchers);
         }
 
     private:
 
-        typename std::function<R(arglist&...)> getOriginalMethodCopyArgs() override {
-            return _impl->getOriginalMethodCopyArgs();
-        }
-
-        typename std::function<R(arglist&...)> getOriginalMethodForwardArgs() override {
-            return _impl->getOriginalMethodForwardArgs();
+        typename std::function<R(arglist&...)> getOriginalMethod() override {
+            return _impl->getOriginalMethod();
         }
 
         std::shared_ptr<Implementation> _impl;
@@ -8488,7 +7799,7 @@ namespace fakeit {
                 : MethodMockingContext<R, arglist...>(stubbingContext) {
         }
 
-        MockingContext(const MockingContext &) = default;
+        MockingContext(MockingContext &) = default;
 
         MockingContext(MockingContext &&other)
                 : MethodMockingContext<R, arglist...>(std::move(other)) {
@@ -8499,13 +7810,18 @@ namespace fakeit {
             return *this;
         }
 
-        template<class ...arg_matcher>
-        MockingContext<R, arglist...> &Using(arg_matcher &&... arg_matchers) {
-            MethodMockingContext<R, arglist...>::setMatchingCriteria(std::forward<arg_matcher>(arg_matchers)...);
+        MockingContext<R, arglist...> &Using(const arglist &... args) {
+            MethodMockingContext<R, arglist...>::setMatchingCriteria(args...);
             return *this;
         }
 
-        MockingContext<R, arglist...> &Matching(const std::function<bool(arglist &...)>& matcher) {
+        template<class ...arg_matcher>
+        MockingContext<R, arglist...> &Using(const arg_matcher &... arg_matchers) {
+            MethodMockingContext<R, arglist...>::setMatchingCriteria(arg_matchers...);
+            return *this;
+        }
+
+        MockingContext<R, arglist...> &Matching(std::function<bool(arglist &...)> matcher) {
             MethodMockingContext<R, arglist...>::setMatchingCriteria(matcher);
             return *this;
         }
@@ -8515,7 +7831,7 @@ namespace fakeit {
             return *this;
         }
 
-        MockingContext<R, arglist...> &operator()(const std::function<bool(arglist &...)>& matcher) {
+        MockingContext<R, arglist...> &operator()(std::function<bool(arglist &...)> matcher) {
             MethodMockingContext<R, arglist...>::setMatchingCriteria(matcher);
             return *this;
         }
@@ -8548,7 +7864,7 @@ namespace fakeit {
                 : MethodMockingContext<void, arglist...>(stubbingContext) {
         }
 
-        MockingContext(const MockingContext &) = default;
+        MockingContext(MockingContext &) = default;
 
         MockingContext(MockingContext &&other)
                 : MethodMockingContext<void, arglist...>(std::move(other)) {
@@ -8559,13 +7875,18 @@ namespace fakeit {
             return *this;
         }
 
-        template<class ...arg_matcher>
-        MockingContext<void, arglist...> &Using(arg_matcher &&... arg_matchers) {
-            MethodMockingContext<void, arglist...>::setMatchingCriteria(std::forward<arg_matcher>(arg_matchers)...);
+        MockingContext<void, arglist...> &Using(const arglist &... args) {
+            MethodMockingContext<void, arglist...>::setMatchingCriteria(args...);
             return *this;
         }
 
-        MockingContext<void, arglist...> &Matching(const std::function<bool(arglist &...)>& matcher) {
+        template<class ...arg_matcher>
+        MockingContext<void, arglist...> &Using(const arg_matcher &... arg_matchers) {
+            MethodMockingContext<void, arglist...>::setMatchingCriteria(arg_matchers...);
+            return *this;
+        }
+
+        MockingContext<void, arglist...> &Matching(std::function<bool(arglist &...)> matcher) {
             MethodMockingContext<void, arglist...>::setMatchingCriteria(matcher);
             return *this;
         }
@@ -8575,7 +7896,7 @@ namespace fakeit {
             return *this;
         }
 
-        MockingContext<void, arglist...> &operator()(const std::function<bool(arglist &...)>& matcher) {
+        MockingContext<void, arglist...> &operator()(std::function<bool(arglist &...)> matcher) {
             MethodMockingContext<void, arglist...>::setMatchingCriteria(matcher);
             return *this;
         }
@@ -8593,7 +7914,7 @@ namespace fakeit {
                 : MethodMockingContext<void>(stubbingContext) {
         }
 
-        DtorMockingContext(const DtorMockingContext &other) : MethodMockingContext<void>(other) {
+        DtorMockingContext(DtorMockingContext &other) : MethodMockingContext<void>(other) {
         }
 
         DtorMockingContext(DtorMockingContext &&other) : MethodMockingContext<void>(std::move(other)) {
@@ -8628,7 +7949,7 @@ namespace fakeit {
             fake->getVirtualTable().setCookie(1, this);
         }
 
-        virtual ~MockImpl() FAKEIT_NO_THROWS {
+        virtual ~MockImpl() NO_THROWS {
             _proxy.detach();
         }
 
@@ -8672,10 +7993,10 @@ namespace fakeit {
             return _fakeit;
         }
 
-        template<class DataType, typename T, typename ... arglist, class = typename std::enable_if<std::is_base_of<T, C>::value>::type>
-        DataMemberStubbingRoot<C, DataType> stubDataMember(DataType T::*member, const arglist &... ctorargs) {
+        template<class DATA_TYPE, typename T, typename ... arglist, class = typename std::enable_if<std::is_base_of<T, C>::value>::type>
+        DataMemberStubbingRoot<C, DATA_TYPE> stubDataMember(DATA_TYPE T::*member, const arglist &... ctorargs) {
             _proxy.stubDataMember(member, ctorargs...);
-            return DataMemberStubbingRoot<T, DataType>();
+            return DataMemberStubbingRoot<T, DATA_TYPE>();
         }
 
         template<int id, typename R, typename T, typename ... arglist, class = typename std::enable_if<std::is_base_of<T, C>::value>::type>
@@ -8769,35 +8090,13 @@ namespace fakeit {
                     : MethodMockingContextBase<R, arglist...>(mock), _vMethod(vMethod) {
             }
 
-            template<typename ... T, typename std::enable_if<all_true<smart_is_copy_constructible<T>::value...>::value, int>::type = 0>
-            std::function<R(arglist&...)> getOriginalMethodCopyArgsInternal(int) {
-                auto mPtr = _vMethod;
-                auto& mock = MethodMockingContextBase<R, arglist...>::_mock;
+
+            virtual std::function<R(arglist&...)> getOriginalMethod() override {
+                void *mPtr = MethodMockingContextBase<R, arglist...>::_mock.getOriginalMethod(_vMethod);
                 C * instance = &(MethodMockingContextBase<R, arglist...>::_mock.get());
-                return [=, &mock](arglist&... args) -> R {
-                    auto methodSwapper = mock.createRaiiMethodSwapper(mPtr);
-                    return (instance->*mPtr)(args...);
-                };
-            }
-
-
-            template<typename ... T>
-            [[noreturn]] std::function<R(arglist&...)> getOriginalMethodCopyArgsInternal(long) {
-                std::abort();
-            }
-
-
-            std::function<R(arglist&...)> getOriginalMethodCopyArgs() override {
-                return getOriginalMethodCopyArgsInternal<arglist...>(0);
-            }
-
-            std::function<R(arglist&...)> getOriginalMethodForwardArgs() override {
-                auto mPtr = _vMethod;
-                auto& mock = MethodMockingContextBase<R, arglist...>::_mock;
-                C * instance = &(MethodMockingContextBase<R, arglist...>::_mock.get());
-                return [=, &mock](arglist&... args) -> R {
-                    auto methodSwapper = mock.createRaiiMethodSwapper(mPtr);
-                    return (instance->*mPtr)(std::forward<arglist>(args)...);
+                return [=](arglist&... args) -> R {
+                    auto m = union_cast<typename VTableMethodType<R,arglist...>::type>(mPtr);
+                    return m(instance, std::forward<arglist>(args)...);
                 };
             }
         };
@@ -8836,13 +8135,9 @@ namespace fakeit {
                     : MethodMockingContextBase<void>(mock) {
             }
 
-            std::function<void()> getOriginalMethodCopyArgs() override {
-                return [=]() -> void {
-                };
-            }
-
-            std::function<void()> getOriginalMethodForwardArgs() override {
-                return [=]() -> void {
+            virtual std::function<void()> getOriginalMethod() override {
+                C &instance = MethodMockingContextBase<void>::_mock.get();
+                return [=, &instance]() -> void {
                 };
             }
 
@@ -8878,11 +8173,6 @@ namespace fakeit {
 			if (VTUtils::hasVirtualDestructor<C>())
 				fake->setDtor(unmockedDtorStubPtr);
 			return reinterpret_cast<C *>(fake);
-        }
-
-        template<typename R, typename ... arglist>
-        Finally createRaiiMethodSwapper(R(C::*vMethod)(arglist...)) {
-            return _proxy.createRaiiMethodSwapper(vMethod);
         }
 
         template<typename R, typename ... arglist>
@@ -8939,37 +8229,21 @@ namespace fakeit {
     template<typename R, typename... Args>
     struct Prototype<R(Args...)> {
 
+        typedef R Type(Args...);
+
+        typedef R ConstType(Args...) const;
+
         template<class C>
         struct MemberType {
 
-            using Type = R (C::*)(Args...);
-            using ConstType = R (C::*)(Args...) const;
-            using RefType = R (C::*)(Args...) &;
-            using ConstRefType = R (C::*)(Args...) const&;
-            using RValRefType = R (C::*)(Args...) &&;
-            using ConstRValRefType = R (C::*)(Args...) const&&;
+            typedef Type(C::*type);
+            typedef ConstType(C::*cosntType);
 
-            static Type get(Type t) {
+            static type get(type t) {
                 return t;
             }
 
-            static ConstType getConst(ConstType t) {
-                return t;
-            }
-
-            static RefType getRef(RefType t) {
-                return t;
-            }
-
-            static ConstRefType getConstRef(ConstRefType t) {
-                return t;
-            }
-
-            static RValRefType getRValRef(RValRefType t) {
-                return t;
-            }
-
-            static ConstRValRefType getConstRValRef(ConstRValRefType t) {
+            static cosntType getconst(cosntType t) {
                 return t;
             }
 
@@ -8994,25 +8268,11 @@ namespace fakeit {
 
 }
 
+
 namespace fakeit {
     namespace internal {
-        template<typename T, typename = void>
-        struct WithCommonVoid {
-            using type = T;
-        };
-
-
-
-
-
-        template<typename T>
-        struct WithCommonVoid<T, typename std::enable_if<std::is_void<T>::value, void>::type> {
-            using type = void;
-        };
-
-        template<typename T>
-        using WithCommonVoid_t = typename WithCommonVoid<T>::type;
     }
+    using namespace fakeit::internal;
 
     template<typename C, typename ... baseclasses>
     class Mock : public ActualInvocationsSource {
@@ -9048,73 +8308,64 @@ namespace fakeit {
 			impl.clear();
 		}
 
-        template<class DataType, typename ... arglist,
-                class = typename std::enable_if<std::is_member_object_pointer<DataType C::*>::value>::type>
-        DataMemberStubbingRoot<C, DataType> Stub(DataType C::* member, const arglist &... ctorargs) {
+        template<class DATA_TYPE, typename ... arglist,
+                class = typename std::enable_if<std::is_member_object_pointer<DATA_TYPE C::*>::value>::type>
+        DataMemberStubbingRoot<C, DATA_TYPE> Stub(DATA_TYPE C::* member, const arglist &... ctorargs) {
             return impl.stubDataMember(member, ctorargs...);
         }
 
-
         template<int id, typename R, typename T, typename ... arglist, class = typename std::enable_if<
-                std::is_base_of<T, C>::value>::type>
-        MockingContext<internal::WithCommonVoid_t<R>, arglist...> stub(R (T::*vMethod)(arglist...) const) {
-            auto methodWithoutConstVolatile = reinterpret_cast<internal::WithCommonVoid_t<R> (T::*)(arglist...)>(vMethod);
+                !std::is_void<R>::value && std::is_base_of<T, C>::value>::type>
+        MockingContext<R, arglist...> stub(R (T::*vMethod)(arglist...) const) {
+            auto methodWithoutConstVolatile = reinterpret_cast<R (T::*)(arglist...)>(vMethod);
             return impl.template stubMethod<id>(methodWithoutConstVolatile);
         }
 
-
         template<int id, typename R, typename T, typename... arglist, class = typename std::enable_if<
-                std::is_base_of<T, C>::value>::type>
-        MockingContext<internal::WithCommonVoid_t<R>, arglist...> stub(R(T::*vMethod)(arglist...) volatile) {
-            auto methodWithoutConstVolatile = reinterpret_cast<internal::WithCommonVoid_t<R>(T::*)(arglist...)>(vMethod);
+                !std::is_void<R>::value && std::is_base_of<T, C>::value>::type>
+        MockingContext<R, arglist...> stub(R(T::*vMethod)(arglist...) volatile) {
+            auto methodWithoutConstVolatile = reinterpret_cast<R(T::*)(arglist...)>(vMethod);
             return impl.template stubMethod<id>(methodWithoutConstVolatile);
         }
 
-
         template<int id, typename R, typename T, typename... arglist, class = typename std::enable_if<
-                std::is_base_of<T, C>::value>::type>
-        MockingContext<internal::WithCommonVoid_t<R>, arglist...> stub(R(T::*vMethod)(arglist...) const volatile) {
-            auto methodWithoutConstVolatile = reinterpret_cast<internal::WithCommonVoid_t<R>(T::*)(arglist...)>(vMethod);
+                !std::is_void<R>::value && std::is_base_of<T, C>::value>::type>
+        MockingContext<R, arglist...> stub(R(T::*vMethod)(arglist...) const volatile) {
+            auto methodWithoutConstVolatile = reinterpret_cast<R(T::*)(arglist...)>(vMethod);
             return impl.template stubMethod<id>(methodWithoutConstVolatile);
         }
 
+        template<int id, typename R, typename T, typename... arglist, class = typename std::enable_if<
+                !std::is_void<R>::value && std::is_base_of<T, C>::value>::type>
+        MockingContext<R, arglist...> stub(R(T::*vMethod)(arglist...)) {
+            return impl.template stubMethod<id>(vMethod);
+        }
 
         template<int id, typename R, typename T, typename... arglist, class = typename std::enable_if<
-                std::is_base_of<T, C>::value>::type>
-        MockingContext<internal::WithCommonVoid_t<R>, arglist...> stub(R(T::*vMethod)(arglist...)) {
-            auto methodWithoutConstVolatile = reinterpret_cast<internal::WithCommonVoid_t<R>(T::*)(arglist...)>(vMethod);
+                std::is_void<R>::value && std::is_base_of<T, C>::value>::type>
+        MockingContext<void, arglist...> stub(R(T::*vMethod)(arglist...) const) {
+            auto methodWithoutConstVolatile = reinterpret_cast<void (T::*)(arglist...)>(vMethod);
             return impl.template stubMethod<id>(methodWithoutConstVolatile);
         }
 
-
         template<int id, typename R, typename T, typename... arglist, class = typename std::enable_if<
-                std::is_base_of<T, C>::value>::type>
-        MockingContext<internal::WithCommonVoid_t<R>, arglist...> stub(R(T::*vMethod)(arglist...) &) {
-            auto methodWithoutConstVolatile = reinterpret_cast<internal::WithCommonVoid_t<R>(T::*)(arglist...)>(vMethod);
+                std::is_void<R>::value && std::is_base_of<T, C>::value>::type>
+        MockingContext<void, arglist...> stub(R(T::*vMethod)(arglist...) volatile) {
+            auto methodWithoutConstVolatile = reinterpret_cast<void (T::*)(arglist...)>(vMethod);
             return impl.template stubMethod<id>(methodWithoutConstVolatile);
         }
 
-
         template<int id, typename R, typename T, typename... arglist, class = typename std::enable_if<
-                std::is_base_of<T, C>::value>::type>
-        MockingContext<internal::WithCommonVoid_t<R>, arglist...> stub(R(T::*vMethod)(arglist...) const&) {
-            auto methodWithoutConstVolatile = reinterpret_cast<internal::WithCommonVoid_t<R>(T::*)(arglist...)>(vMethod);
+                std::is_void<R>::value && std::is_base_of<T, C>::value>::type>
+        MockingContext<void, arglist...> stub(R(T::*vMethod)(arglist...) const volatile) {
+            auto methodWithoutConstVolatile = reinterpret_cast<void (T::*)(arglist...)>(vMethod);
             return impl.template stubMethod<id>(methodWithoutConstVolatile);
         }
 
-
         template<int id, typename R, typename T, typename... arglist, class = typename std::enable_if<
-                std::is_base_of<T, C>::value>::type>
-        MockingContext<internal::WithCommonVoid_t<R>, arglist...> stub(R(T::*vMethod)(arglist...) &&) {
-            auto methodWithoutConstVolatile = reinterpret_cast<internal::WithCommonVoid_t<R>(T::*)(arglist...)>(vMethod);
-            return impl.template stubMethod<id>(methodWithoutConstVolatile);
-        }
-
-
-        template<int id, typename R, typename T, typename... arglist, class = typename std::enable_if<
-                std::is_base_of<T, C>::value>::type>
-        MockingContext<internal::WithCommonVoid_t<R>, arglist...> stub(R(T::*vMethod)(arglist...) const&&) {
-            auto methodWithoutConstVolatile = reinterpret_cast<internal::WithCommonVoid_t<R>(T::*)(arglist...)>(vMethod);
+                std::is_void<R>::value && std::is_base_of<T, C>::value>::type>
+        MockingContext<void, arglist...> stub(R(T::*vMethod)(arglist...)) {
+            auto methodWithoutConstVolatile = reinterpret_cast<void (T::*)(arglist...)>(vMethod);
             return impl.template stubMethod<id>(methodWithoutConstVolatile);
         }
 
@@ -9169,7 +8420,7 @@ namespace fakeit {
             reference->AddRef();
         }
 
-        ~smart_ptr() FAKEIT_THROWS {
+        ~smart_ptr() THROWS {
             if (reference->Release() == 0) {
                 delete reference;
                 delete pData;
@@ -9213,7 +8464,7 @@ namespace fakeit {
 
             friend class WhenFunctor;
 
-            virtual ~StubbingChange() FAKEIT_THROWS {
+            virtual ~StubbingChange() THROWS {
 
                 if (UncaughtException()) {
                     return;
@@ -9222,7 +8473,7 @@ namespace fakeit {
                 _xaction.commit();
             }
 
-            StubbingChange(const StubbingChange &other) :
+            StubbingChange(StubbingChange &other) :
                     _xaction(other._xaction) {
             }
 
@@ -9244,7 +8495,7 @@ namespace fakeit {
 
             virtual ~MethodProgress() override = default;
 
-            MethodProgress(const MethodProgress &other) :
+            MethodProgress(MethodProgress &other) :
                     _progress(other._progress), _context(other._context) {
             }
 
@@ -9474,7 +8725,7 @@ namespace fakeit {
 
         friend class SequenceVerificationProgress;
 
-        ~SequenceVerificationExpectation() FAKEIT_THROWS {
+        ~SequenceVerificationExpectation() THROWS {
             if (UncaughtException()) {
                 return;
             }
@@ -9489,10 +8740,6 @@ namespace fakeit {
             _expectedCount = count;
         }
 
-        void expectAnything() {
-            _expectAnything = true;
-        }
-
         void setFileInfo(const char * file, int line, const char * callingMethod) {
             _file = file;
             _line = line;
@@ -9505,7 +8752,6 @@ namespace fakeit {
         InvocationsSourceProxy _involvedInvocationSources;
         std::vector<Sequence *> _expectedPattern;
         int _expectedCount;
-        bool _expectAnything;
 
         const char * _file;
         int _line;
@@ -9520,7 +8766,6 @@ namespace fakeit {
                 _involvedInvocationSources(mocks),
                 _expectedPattern(expectedPattern),
                 _expectedCount(-1),
-                _expectAnything(false),
                 _line(0),
                 _isVerified(false) {
         }
@@ -9534,14 +8779,12 @@ namespace fakeit {
             MatchAnalysis ma;
             ma.run(_involvedInvocationSources, _expectedPattern);
 
-            if (isNotAnythingVerification()) {
-                if (isAtLeastVerification() && atLeastLimitNotReached(ma.count)) {
-                    return handleAtLeastVerificationEvent(verificationErrorHandler, ma.actualSequence, ma.count);
-                }
+            if (isAtLeastVerification() && atLeastLimitNotReached(ma.count)) {
+                return handleAtLeastVerificationEvent(verificationErrorHandler, ma.actualSequence, ma.count);
+            }
 
-                if (isExactVerification() && exactLimitNotMatched(ma.count)) {
-                    return handleExactVerificationEvent(verificationErrorHandler, ma.actualSequence, ma.count);
-                }
+            if (isExactVerification() && exactLimitNotMatched(ma.count)) {
+                return handleExactVerificationEvent(verificationErrorHandler, ma.actualSequence, ma.count);
             }
 
             markAsVerified(ma.matchedInvocations);
@@ -9563,10 +8806,6 @@ namespace fakeit {
             for (auto i : matchedInvocations) {
                 i->markAsVerified();
             }
-        }
-
-        bool isNotAnythingVerification() {
-            return !_expectAnything;
         }
 
         bool isAtLeastVerification() {
@@ -9673,18 +8912,13 @@ namespace fakeit {
 
     public:
 
-        ~SequenceVerificationProgress() FAKEIT_THROWS { };
+        ~SequenceVerificationProgress() THROWS { };
 
         operator bool() const {
             return Terminator(_expectationPtr);
         }
 
         bool operator!() const { return !Terminator(_expectationPtr); }
-
-        Terminator Any() {
-            _expectationPtr->expectAnything();
-            return Terminator(_expectationPtr);
-        }
 
         Terminator Never() {
             Exactly(0);
@@ -9839,7 +9073,7 @@ namespace fakeit {
 
             friend class VerifyNoOtherInvocationsVerificationProgress;
 
-            ~VerifyNoOtherInvocationsExpectation() FAKEIT_THROWS {
+            ~VerifyNoOtherInvocationsExpectation() THROWS {
                 if (UncaughtException()) {
                     return;
                 }
@@ -9871,7 +9105,7 @@ namespace fakeit {
                     _isVerified(false) {
             }
 
-            VerifyNoOtherInvocationsExpectation(const VerifyNoOtherInvocationsExpectation &other) = default;
+            VerifyNoOtherInvocationsExpectation(VerifyNoOtherInvocationsExpectation &other) = default;
 
             void VerifyExpectation(VerificationEventHandler &verificationErrorHandler) {
                 if (_isVerified)
@@ -9926,7 +9160,7 @@ namespace fakeit {
     public:
 
 
-        ~VerifyNoOtherInvocationsVerificationProgress() FAKEIT_THROWS {
+        ~VerifyNoOtherInvocationsVerificationProgress() THROWS {
         };
 
         VerifyNoOtherInvocationsVerificationProgress setFileInfo(const char * file, int line,
@@ -9970,51 +9204,15 @@ namespace fakeit {
     };
 
 }
-#include <type_traits>
-
-
 namespace fakeit {
 
     class SpyFunctor {
     private:
 
-        template<typename R, typename ... arglist, typename std::enable_if<all_true<smart_is_copy_constructible<arglist>::value...>::value, int>::type = 0>
-        void spy(const SpyingContext<R, arglist...> &root, int) {
-            SpyingContext<R, arglist...> &rootWithoutConst = const_cast<SpyingContext<R, arglist...> &>(root);
-            auto methodFromOriginalVT = rootWithoutConst.getOriginalMethodCopyArgs();
-            rootWithoutConst.appendAction(new ReturnDelegateValue<R, arglist...>(methodFromOriginalVT));
-            rootWithoutConst.commit();
-        }
-
-        template<typename R, typename ... arglist>
-        void spy(const SpyingContext<R, arglist...> &, long) {
-            static_assert(!std::is_same<R, R>::value, "Spy() cannot accept move-only args, use SpyWithoutVerify() instead which is able to forward these args but then they won't be available for Verify().");
-        }
-
-        void operator()() {
-        }
-
-    public:
-
-        template<typename H, typename ... M>
-        void operator()(const H &head, const M &... tail) {
-            spy(head, 0);
-            this->operator()(tail...);
-        }
-
-    };
-
-}
-
-namespace fakeit {
-
-    class SpyWithoutVerifyFunctor {
-    private:
-
         template<typename R, typename ... arglist>
         void spy(const SpyingContext<R, arglist...> &root) {
             SpyingContext<R, arglist...> &rootWithoutConst = const_cast<SpyingContext<R, arglist...> &>(root);
-            auto methodFromOriginalVT = rootWithoutConst.getOriginalMethodForwardArgs();
+            auto methodFromOriginalVT = rootWithoutConst.getOriginalMethod();
             rootWithoutConst.appendAction(new ReturnDelegateValue<R, arglist...>(methodFromOriginalVT));
             rootWithoutConst.commit();
         }
@@ -10033,6 +9231,7 @@ namespace fakeit {
     };
 
 }
+
 #include <vector>
 #include <set>
 
@@ -10102,7 +9301,6 @@ namespace fakeit {
     static VerifyNoOtherInvocationsFunctor VerifyNoOtherInvocations(Fakeit);
     static UnverifiedFunctor Unverified(Fakeit);
     static SpyFunctor Spy;
-    static SpyWithoutVerifyFunctor SpyWithoutVerify;
     static FakeFunctor Fake;
     static WhenFunctor When;
 
@@ -10116,7 +9314,6 @@ namespace fakeit {
             use(&Fake);
             use(&When);
             use(&Spy);
-            use(&SpyWithoutVerify);
             use(&Using);
             use(&Verify);
             use(&VerifyNoOtherInvocations);
@@ -10133,22 +9330,10 @@ namespace fakeit {
     std::remove_reference<decltype((mock).get())>::type
 
 #define OVERLOADED_METHOD_PTR(mock, method, prototype) \
-    fakeit::Prototype<prototype>::template MemberType<typename MOCK_TYPE(mock)>::get(&MOCK_TYPE(mock)::method)
+    fakeit::Prototype<prototype>::MemberType<MOCK_TYPE(mock)>::get(&MOCK_TYPE(mock)::method)
 
 #define CONST_OVERLOADED_METHOD_PTR(mock, method, prototype) \
-    fakeit::Prototype<prototype>::template MemberType<typename MOCK_TYPE(mock)>::getConst(&MOCK_TYPE(mock)::method)
-
-#define REF_OVERLOADED_METHOD_PTR(mock, method, prototype) \
-    fakeit::Prototype<prototype>::MemberType<typename MOCK_TYPE(mock)>::getRef(&MOCK_TYPE(mock)::method)
-
-#define CONST_REF_OVERLOADED_METHOD_PTR(mock, method, prototype) \
-    fakeit::Prototype<prototype>::MemberType<typename MOCK_TYPE(mock)>::getConstRef(&MOCK_TYPE(mock)::method)
-
-#define R_VAL_REF_OVERLOADED_METHOD_PTR(mock, method, prototype) \
-    fakeit::Prototype<prototype>::MemberType<typename MOCK_TYPE(mock)>::getRValRef(&MOCK_TYPE(mock)::method)
-
-#define CONST_R_VAL_REF_OVERLOADED_METHOD_PTR(mock, method, prototype) \
-    fakeit::Prototype<prototype>::MemberType<typename MOCK_TYPE(mock)>::getConstRValRef(&MOCK_TYPE(mock)::method)
+    fakeit::Prototype<prototype>::MemberType<MOCK_TYPE(mock)>::getconst(&MOCK_TYPE(mock)::method)
 
 #define Dtor(mock) \
     (mock).dtor().setMethodDetails(#mock,"destructor")
@@ -10161,18 +9346,6 @@ namespace fakeit {
 
 #define ConstOverloadedMethod(mock, method, prototype) \
     (mock).template stub<__COUNTER__>(CONST_OVERLOADED_METHOD_PTR( mock , method, prototype )).setMethodDetails(#mock,#method)
-
-#define RefOverloadedMethod(mock, method, prototype) \
-    (mock).template stub<__COUNTER__>(REF_OVERLOADED_METHOD_PTR( mock , method, prototype )).setMethodDetails(#mock,#method)
-
-#define ConstRefOverloadedMethod(mock, method, prototype) \
-    (mock).template stub<__COUNTER__>(CONST_REF_OVERLOADED_METHOD_PTR( mock , method, prototype )).setMethodDetails(#mock,#method)
-
-#define RValRefOverloadedMethod(mock, method, prototype) \
-    (mock).template stub<__COUNTER__>(R_VAL_REF_OVERLOADED_METHOD_PTR( mock , method, prototype )).setMethodDetails(#mock,#method)
-
-#define ConstRValRefOverloadedMethod(mock, method, prototype) \
-    (mock).template stub<__COUNTER__>(CONST_R_VAL_REF_OVERLOADED_METHOD_PTR( mock , method, prototype )).setMethodDetails(#mock,#method)
 
 #define Verify(...) \
         Verify( __VA_ARGS__ ).setFileInfo(__FILE__, __LINE__, __func__)
@@ -10188,3 +9361,4 @@ namespace fakeit {
 
 #define When(call) \
     When(call)
+
