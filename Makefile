@@ -1,7 +1,7 @@
 default_target: all
 
 .PHONY: all
-all: clean build test clean
+all: clean build deploy test clean
 
 .PHONY: cmake
 cmake:

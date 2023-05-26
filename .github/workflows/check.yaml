@@ -16,6 +16,3 @@ jobs:
       -
         name: Tests
         run: make
-      -
-        name: Deploy
-        run: make deploy
