@@ -8,11 +8,40 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-20.04, ubuntu-22.04]
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       -
         name: Tests
         run: make
+
+  examples:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, ubuntu-22.04]
+        example: [mock-injection, wiring-blink]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+      -
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      -
+        name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+      -
+        name: Tests
+        run: pio test -d examples/wiring-blink/
