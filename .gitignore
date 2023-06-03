@@ -1,6 +1,7 @@
 .pioenvs
 .piolibdeps
 /external/unity/*-repo/
+/external/fakeit/*-repo/
 /build/
 /.cproject
 /.project
@@ -12,3 +13,6 @@
 /Testing/*
 .pio/*
 .vscode/*
+/test/test_main.cpp
+output.txt
+error.txt
