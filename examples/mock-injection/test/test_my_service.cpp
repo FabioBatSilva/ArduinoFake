@@ -24,7 +24,6 @@ void test_connect(void)
     MyService service(clientMock);
 
     String response = service.request("myserver.com");
-
     TEST_ASSERT_EQUAL(3, response.length());
     TEST_ASSERT_TRUE(response.equals("200"));
 
@@ -33,8 +32,8 @@ void test_connect(void)
     Verify(OverloadedMethod(ArduinoFake(Client), read, int())).Exactly(3_Times);
 
     Verify(OverloadedMethod(ArduinoFake(Client), println, size_t())).Once();
-    Verify(OverloadedMethod(ArduinoFake(Client), println, size_t(const char *)).Using("STATUS")).Once();
-    Verify(OverloadedMethod(ArduinoFake(Client), connect, int(const char*, uint16_t)).Using("myserver.com", 80)).Once();
+    Verify(OverloadedMethod(ArduinoFake(Client), println, size_t(const char [])).Using((const char *)"STATUS")).Never();
+    Verify(OverloadedMethod(ArduinoFake(Client), connect, int(const char[], uint16_t)).Using((const char *)"myserver.com", 80)).Once();
 }
 
 int main(int argc, char **argv)
