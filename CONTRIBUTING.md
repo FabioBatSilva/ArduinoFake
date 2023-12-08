@@ -84,7 +84,7 @@ I was missing `sei()`, `cli()` and `attachInterrupt()` in `ArduinoFake`, here is
     }
 1. excersice tests from command line, there are two ways based on your Makefile
    * default project [Makefile](/Makefile), 
-     * execute `make`  
+     * execute `make` (`make` requires `cmake` - install it via `apt` / `brew` / `yum` or whatever package manager your system uses)
      * verify
    ```
 	Running tests...
