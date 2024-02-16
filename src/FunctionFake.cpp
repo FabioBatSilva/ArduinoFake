@@ -31,6 +31,11 @@ void analogReference(uint8_t mode)
     ArduinoFakeInstance(Function)->analogReference(mode);
 }
 
+void analogReadResolution(uint8_t mode)
+{
+    ArduinoFakeInstance(Function)->analogReadResolution(mode);
+}
+
 unsigned long millis(void)
 {
     return ArduinoFakeInstance(Function)->millis();
