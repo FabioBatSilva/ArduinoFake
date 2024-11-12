@@ -75,7 +75,7 @@ namespace SerialTest
         Verify(Method(ArduinoFake(Serial), flush)).Once();
         Verify(Method(ArduinoFake(Serial), end)).Once();
 
-        Verify(OverloadedMethod(ArduinoFake(Serial), setDebugOutput, void(bool)).Using(true)).Once();
+        Verify(Method(ArduinoFake(Serial), setDebugOutput)).Once();
     }
 
     void run_tests()
