@@ -65,6 +65,7 @@ namespace SerialTest
 
         Serial.flush();
         Serial.end();
+        Serial.setDebugOutput(true);
 
         Verify(OverloadedMethod(ArduinoFake(Serial), begin, void(unsigned long)).Using(9600)).Once();
         Verify(Method(ArduinoFake(Serial), available)).Exactly(2_Times);
@@ -73,6 +74,8 @@ namespace SerialTest
 
         Verify(Method(ArduinoFake(Serial), flush)).Once();
         Verify(Method(ArduinoFake(Serial), end)).Once();
+
+        Verify(OverloadedMethod(ArduinoFake(Serial), setDebugOutput, size_t(bool)).Using(true)).Once();
     }
 
     void run_tests()
