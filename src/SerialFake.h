@@ -28,6 +28,8 @@ struct SerialFake : public StreamFake
     virtual uint8_t numbits() = 0;
     virtual bool dtr() = 0;
     virtual bool rts() = 0;
+
+    virtual void setDebugOutput(bool) = 0;
 };
 
 class SerialFakeProxy : public StreamFakeProxy, public Serial_
