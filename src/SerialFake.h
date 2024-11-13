@@ -29,7 +29,7 @@ struct SerialFake : public StreamFake
     virtual bool dtr() = 0;
     virtual bool rts() = 0;
 
-    virtual void setDebugOutput(bool) = 0;
+    virtual void setDebugOutput(bool);
 };
 
 class SerialFakeProxy : public StreamFakeProxy, public Serial_
