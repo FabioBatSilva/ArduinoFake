@@ -5,7 +5,7 @@
     #define USBCON
 #endif
 
-#include <unordered_map>  
+#include <unordered_map>
 #include <cstring>
 #include <cstdint>
 #include <stdexcept>
@@ -122,6 +122,9 @@ class ArduinoFakeContext
 
         void reset(void)
         {
+            if (this->Instances) {
+                delete this->Instances;
+            }
             this->Instances = new ArduinoFakeInstances();
 
             this->Mocks->Function.Reset();
