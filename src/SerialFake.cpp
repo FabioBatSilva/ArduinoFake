@@ -83,6 +83,10 @@ bool Serial_::rts()
     return ArduinoFakeInstance(Serial, this)->rts();
 }
 
+void Serial_::setDebugOutput(bool _value){
+    return ArduinoFakeInstance(Serial, this) -> setDebugOutput(_value);
+}
+
 int32_t Serial_::readBreak()
 {
     return ArduinoFakeInstance(Serial, this)->readBreak();
