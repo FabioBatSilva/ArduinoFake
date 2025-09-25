@@ -105,6 +105,8 @@ public:
 	volatile uint8_t _rx_buffer_tail;
 	unsigned char _rx_buffer[SERIAL_BUFFER_SIZE];
 
+	virtual void setDebugOutput(bool);
+
 	// This method allows processing "SEND_BREAK" requests sent by
 	// the USB host. Those requests indicate that the host wants to
 	// send a BREAK signal and are accompanied by a single uint16_t
