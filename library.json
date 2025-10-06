@@ -15,7 +15,10 @@
     "test"
   ],
   "build": {
-    "libCompatMode": "off"
+    "libCompatMode": "off",
+    "flags": [
+        "-I src/arduino"
+    ]
   },
   "frameworks": "arduino",
   "platforms": "native"
