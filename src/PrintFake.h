@@ -8,6 +8,9 @@ struct PrintFake
     virtual size_t write(const uint8_t *buffer, size_t size) = 0;
     virtual size_t write(uint8_t) = 0;
 
+    virtual size_t printf(const char *format, ...) = 0;
+
+
     virtual size_t print(const __FlashStringHelper *) = 0;
     virtual size_t print(const String &) = 0;
     virtual size_t print(const char[]) = 0;
