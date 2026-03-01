@@ -122,10 +122,11 @@ class ArduinoFakeContext
 
         void reset(void)
         {
+            ArduinoFakeInstances* newInstances = new ArduinoFakeInstances();
             if (this->Instances) {
                 delete this->Instances;
             }
-            this->Instances = new ArduinoFakeInstances();
+            this->Instances = newInstances;
 
             this->Mocks->Function.Reset();
             this->Mocks->Stream.Reset();

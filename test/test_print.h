@@ -95,10 +95,27 @@ namespace PrintTest
         Verify(OverloadedMethod(ArduinoFake(Print), println, size_t(unsigned long, int)).Using(unsigned_long_var, DEC)).Once();
     }
 
+
+    void test_printf(void)
+    {
+        const char * format = "format %d %s";
+        int int_var = 123;
+        const char * char_array_var = "char_array_var";
+        const char * expected_output = "format 123 char_array_var";
+
+        When(OverloadedMethod(ArduinoFake(Print), write, size_t(const uint8_t *, size_t ))).AlwaysReturn(strlen(expected_output));
+        Print* print = ArduinoFakeMock(Print);
+
+        size_t result = print->printf(format, int_var, char_array_var);
+        TEST_ASSERT_EQUAL(strlen(expected_output), result);
+
+    }       
+
     void run_tests()
     {
-        RUN_TEST(PrintTest::test_print_variables);
         RUN_TEST(PrintTest::test_println_variables);
+        RUN_TEST(PrintTest::test_print_variables);
+        RUN_TEST(PrintTest::test_printf);
     }
 }
 
